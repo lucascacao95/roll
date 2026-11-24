@@ -1,68 +1,54 @@
-# Roll — identidade e implementação
+# Roll — brand identity
 
-- Nome oficial e produto gerado: **Roll** (`Roll.app`, executável `Roll`).
-- Wordmark: **roll.**, fonte do sistema, semibold; tagline fixa **From capture to collection.**
-- Utilitário nativo de fotografia para macOS; ferramenta digital moderna com alma analógica.
-- Público: entusiastas e amadores com câmeras dedicadas, arquivos próprios e pares RAW+JPEG.
-- Simplicidade, cuidado, autonomia, nostalgia, organização e confiabilidade.
+Official product: **Roll** (`Roll.app`, executable `Roll`). Wordmark: **roll.**, lowercase system semibold,
+with a small amber period. Tagline: **From capture to collection.** Philosophy:
+**Your photographs. Your files. Your collection.**
 
-## Uso visual
+A native photography utility for enthusiasts: simple, careful, independent, organized and trustworthy,
+with a restrained analog reference. Use compact branding in the sidebar, empty state and About window.
+Keep photographs prominent and native macOS conventions intact.
 
-SF Pro e componentes SwiftUI nativos. Wordmark compacto na barra lateral e Sobre; fotografias
-continuam protagonistas. Ivory `#F4EBDD`, Charcoal `#242424`, Amber `#C77736`, Olive `#8C9380`.
-A paleta está em `PhotoImporter/Assets.xcassets`. Fundos permanecem semânticos do macOS, sem
-texturas ou preenchimento bege generalizado. Amber marca o wordmark e a seção selecionada,
-com texto Charcoal. Olive aparece na capacidade de armazenamento, não como substituto de sucesso.
-O AccentColor usa variantes acessíveis: `#985322` no modo claro e `#DEA36F` no escuro.
-Sucesso, erro, alerta e informação mantêm cores semânticas. Sem fontes ou dependências externas.
+## Visual language
 
-## Linguagem
+Use SF Pro and system symbols, no external fonts. Reference palette: Ivory #F4EBDD, Charcoal #242424,
+Amber #C77736, Olive #8C9380. Keep semantic macOS backgrounds; do not spread beige textures across screens.
+Amber identifies the wordmark and selected navigation, with Charcoal text. Olive is used sparingly for capacity.
+Success, error, warning and information retain semantic colors. AccentColor variants are #985322 (light)
+and #DEA36F (dark). Color assets are in `PhotoImporter/Assets.xcassets`.
 
-Idioma de desenvolvimento e fallback: inglês. `Localizable.xcstrings` contém inglês e pt-BR,
-incluindo mensagens de erro, verificação e recuperação. O macOS escolhe pelo idioma preferido;
-não há seletor próprio que sobrescreva o sistema. O app usa New Roll / Novo rolo, History /
-Histórico, Previous Rolls / Rolos anteriores, Archive / Acervo, Settings / Ajustes e Import Roll /
-Importar rolo. Mensagens técnicas permanecem explícitas. Textos já gravados em registros antigos
-permanecem no idioma original, sem reescrever o histórico.
+## Language
 
-`Localization.swift` formata argumentos separados do texto traduzido. Placeholders `%@` devem
-preservar quantidade e ordem entre idiomas; nomes e caminhos não são traduzidos. Novas mensagens
-devem incluir chave em inglês e tradução pt-BR no catálogo. Os testes tradicionais rodam em pt-BR
-pois algumas asserções verificam mensagens; os testes de localização também verificam os dois idiomas.
+English source keys/fallback and pt-BR translations live in Localizable.xcstrings. macOS selects the
+preferred language; Roll has no independent language override. Use New Roll / Novo rolo, History /
+Histórico, Previous Rolls / Rolos anteriores, Archive / Acervo, Settings / Ajustes, Import Roll / Importar rolo.
+Keep technical and safety messages explicit. Existing recorded messages remain in their original language.
 
-## Compatibilidade
+Localization.swift formats arguments separately from translated templates. Keep `%@` placeholders aligned;
+never use filenames as format strings or translate actual paths. Run catalog tests in both languages.
 
-Projeto, target, scheme, módulo e pastas de código permanecem **PhotoImporter**. Isso evita
-renomeações cosméticas e mantém `@testable import PhotoImporter`. O produto/executável, os nomes
-visíveis, o menu do aplicativo, a janela Sobre, o pacote e o host dos testes usam **Roll**.
+## Compatibility
 
-Permanecem inalterados: Bundle Identifier `local.lucas.PhotoImporter`, UserDefaults/keys,
-security-scoped bookmarks, `PhotoImporter/Imports`, schemas JSON, identidades, locks e nomes
-`.photoimporter-*.partial`. Valores raw dos enums antigos são mantidos e recebem rótulos localizados.
-Não há migração de dados, nova organização de arquivos, alteração no agrupamento ou nas regras de cópia.
-O nome Roll representa uma sessão de importação, não um catálogo proprietário ou uma pasta adicional.
+Project, target, scheme, module and source folder remain PhotoImporter. User-visible names are Roll.
+Do not rename the bundle identifier, UserDefaults keys, app-scoped bookmarks, `PhotoImporter/Imports`,
+JSON schemas, operation locks or `.photoimporter-*.partial` names for branding. Raw enum values remain
+compatible and receive localized labels. A roll is a session, not a new on-disk data model.
 
-Ao instalar Roll, remover manualmente a cópia antiga `PhotoImporter.app` apenas depois de encerrar
-operações; não manter duas cópias com o mesmo Bundle Identifier em uso. O empacotamento não apaga
-nem substitui automaticamente um app instalado ou um DMG anterior.
+## Icon
 
-## Ícone provisório e arte definitiva
+The current icon is original geometry authored for Roll in [GenerateAppIcon.swift](../scripts/GenerateAppIcon.swift),
+rendered using Core Graphics and ImageIO, with no source images, fonts, logos, system symbol artwork or
+external assets. The preview is [branding/roll-icon.png](branding/roll-icon.png). Native slots cover 16–1024 px
+(including @2x). Xcode compiles AppIcon.icns and metadata; About displays the same application icon.
+Both configurations retain ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon.
 
-A primeira imagem enviada pelo usuário foi aprovada como ícone **provisório** do Roll.
-O PNG original de 1024 × 1024 está preservado, sem alteração de arte, em
-[branding/roll-provisional-source.png](branding/roll-provisional-source.png).
-O fundo branco e a composição da imagem foram mantidos; não houve recorte ou geração de nova arte.
+The generator and its outputs are covered by the project's approved MIT license. This replaces the supplied
+attachment, whose provenance could not be established. Historical copies remain pending approved cleanup;
+see [ASSETS.md](ASSETS.md) and [migration inventory](ICON_MIGRATION.md).
 
-`PhotoImporter/Assets.xcassets/AppIcon.appiconset` contém os dez slots nativos de macOS,
-de 16 × 16 a 1024 × 1024 pixels (incluindo @2x), exportados com `sips`.
-Debug e Release usam `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`. Xcode gera o `.icns`
-e os metadados do bundle. A janela Sobre usa o ícone do próprio aplicativo, assim como Finder e Dock.
-A versão 0.1.1 (build 2) identifica o primeiro pacote com ícone, preservando os DMGs anteriores.
+Visual direction: charcoal 35 mm cartridge, amber label, ivory background, perforated strip, restrained
+olive detail and subtle depth. No manufacturer logos, generic cameras, download arrows, external fonts or
+long text. Small-size art can be refined later without changing the bundle identity or storage behavior.
 
-A arte definitiva continua pendente: cartucho 35 mm em carvão, rótulo âmbar, fundo marfim,
-tira perfurada, profundidade sutil e silhueta legível em tamanhos pequenos. Sem logos de fabricantes,
-câmeras genéricas, setas de download, textos longos ou aparência de emoji. A segunda imagem
-continua como referência, sem substituir o ícone aprovado provisoriamente.
-
-Para substituir a arte, preencher os mesmos slots com PNGs correspondentes, mantendo Bundle Identifier,
-persistência e regras de segurança. Validar tamanhos pequenos, Finder, Dock e Sobre em claro/escuro.
+Regenerate from the repository root with `xcrun swift scripts/GenerateAppIcon.swift`. Review the PNG diff,
+Finder/Dock/About and small sizes in both appearances before shipping. Geometry is reproducible; exact PNG
+encoding/rasterization may vary between platform releases. No download or image service is required.

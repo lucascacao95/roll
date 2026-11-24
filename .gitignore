@@ -1,6 +1,38 @@
+# macOS and Xcode user state
 .DS_Store
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Reproducible source and shared schemes stay tracked; generated outputs do not.
 DerivedData/
 build/
-*.xcuserstate
-xcuserdata/
 .build/
+.swiftpm/xcode/
+*.xcresult
+*.app
+*.dSYM/
+*.dmg
+*.zip
+*.log
+*.tmp
+*.swp
+*~
+
+# Local configuration, signing material and credentials
+.env
+.env.*
+!.env.example
+*.p12
+*.pfx
+*.pem
+*.key
+*.mobileprovision
+*.provisionprofile
+
+# Local application state and demo data (never commit user archives)
+PhotoImporter/Imports/
+*.bookmark
+*.partial
+.demo/

@@ -52,7 +52,9 @@ actor PhotoScanner {
         ) else { throw ScanError.cannotEnumerate }
 
         var files: [PhotoFile] = []
-        for case let url as URL in enumerator {
+        for case let enumeratedURL as URL in enumerator {
+            // Foundation enumeration can return /private/tmp for a standardized /tmp root.
+            let url = enumeratedURL.standardizedFileURL
             try Task.checkCancellation()
             do {
                 let values = try url.resourceValues(forKeys: Set(keys))

@@ -26,7 +26,7 @@ struct AboutRollView: View {
     }
     var body: some View {
         VStack(spacing: 16) {
-            // The provisional artwork is shared with Finder and Dock through the app bundle.
+            // The original code-generated artwork is shared with Finder and Dock through the app bundle.
             Image(nsImage: NSApplication.shared.applicationIconImage)
                 .resizable().interpolation(.high).scaledToFit().frame(width: 72, height: 72)
                 .accessibilityHidden(true)

@@ -225,6 +225,28 @@ final class ImportTests: XCTestCase {
         XCTAssertTrue(try partials(fixture.library).isEmpty)
     }
 
+    func testDeviceDisconnectionDuringCopyStopsRemainingFilesAndPreservesSource() async throws {
+        let fixture = try Fixture()
+        defer { fixture.remove() }
+        let before = try snapshot(fixture.source)
+        let plan = try await fixture.plan()
+        let report = try await fixture.service { point in
+            if point.phase == .chunkCopied {
+                throw NSError(domain: NSPOSIXErrorDomain, code: Int(ENODEV))
+            }
+        }.run(plan)
+        XCTAssertEqual(report.state, .failed)
+        XCTAssertEqual(report.failedCount, 1)
+        XCTAssertEqual(report.files.filter { $0.status == .pending }.count, 1)
+        XCTAssertEqual(try snapshot(fixture.source), before)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: fixture.finalJPEG.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: fixture.finalRAW.path))
+        XCTAssertTrue(try partials(fixture.library).isEmpty)
+        let retry = try await fixture.service().run(plan)
+        XCTAssertEqual(retry.state, .completed)
+        XCTAssertEqual(retry.copiedCount, 2)
+    }
+
     func testJournalFailurePreventsLibraryWrites() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }

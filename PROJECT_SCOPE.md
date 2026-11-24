@@ -1,243 +1,111 @@
-# Roll
+# Roll — product scope
 
-## Identidade do produto
+This document is the product source of truth. Implementation details and verified release evidence
+live in [architecture](docs/ARCHITECTURE.md) and [release readiness](docs/RELEASE_READINESS.md).
 
-- Nome oficial: **Roll**. Wordmark: **roll.**. Tagline: **From capture to collection.**
-- Categoria: utilitário nativo de fotografia para macOS; uma ferramenta digital moderna com alma analógica.
-- Público inicial: fotógrafos entusiastas e amadores que usam câmeras dedicadas, preservam seus arquivos e podem fotografar RAW+JPEG.
-- Personalidade: simplicidade, cuidado, autonomia, nostalgia, organização e confiabilidade.
-- Idioma de desenvolvimento: inglês, com localização em português brasileiro pelo sistema.
-- Terminologia: New Roll / Novo rolo, Import Roll / Importar rolo, History / Histórico,
-  Previous Rolls / Rolos anteriores, Archive / Acervo, Settings / Ajustes.
-- Um roll representa uma sessão de importação. A metáfora não altera pastas, agrupamento, histórico ou regras de cópia.
-- Usar SF Pro, componentes nativos, modo claro/escuro, contraste e cores semânticas.
-- Paleta de referência: Ivory `#F4EBDD`, Charcoal `#242424`, Amber `#C77736`, Olive `#8C9380`.
-  Aplicar a marca em pequenos detalhes, sem fundos bege/texturas generalizados ou decoração que concorra com as fotografias.
-- Ícone definitivo pendente: cartucho 35 mm carvão, rótulo âmbar, fundo marfim, tira perfurada,
-  sombras sutis e silhueta legível. A primeira imagem de referência foi aprovada como ícone provisório
-  e integrada na versão 0.1.1; a arte definitiva continua pendente. Sem logos de fabricantes ou aparência de emoji.
-- O produto gerado é `Roll.app`; projeto/target/módulo internos continuam `PhotoImporter`.
-  Bundle Identifier, persistência, bookmarks e identificadores existentes devem permanecer compatíveis.
-- Diretrizes técnicas e de assets: [docs/BRANDING.md](docs/BRANDING.md).
+## Identity and purpose
 
-## Objetivo
+- Official name: **Roll**. Wordmark: **roll.**. Tagline: **From capture to collection.**
+- Native macOS photography utility using Swift 6 and SwiftUI, with platform APIs first.
+- For enthusiasts with dedicated cameras, personal files and RAW + JPEG captures.
+- A modern digital tool with an analog soul: simplicity, care, autonomy, nostalgia, order and reliability.
+- English interface keys and documentation, with Brazilian Portuguese localization selected by macOS.
+- A roll is an import session; the metaphor does not change folder structures or grouping rules.
+- **Your photographs. Your files. Your collection.**
 
-Aplicativo nativo para macOS que importa fotografias de cartões SD para uma biblioteca convencional de pastas em SSD externo, com seleção visual, filtros, organização e cópia segura. Não é um editor, catálogo fotográfico ou sistema de backup.  
+Import photographs from cards and folders directly into a conventional file archive, preferably on an
+external SSD. Select visually, filter, organize and copy safely. Files remain accessible in Finder/Preview.
+This is not an editor, catalog or backup system.
 
-## Contexto
+## Principles
 
-- Câmera inicial: Panasonic Lumix G100D.
+1. Originals are read-only: never modify, move or delete source files.
+2. Preserve original filenames and bytes. Never silently overwrite existing content.
+3. A partial copy must not be published under the final filename.
+4. Verify size and SHA-256, handle failures explicitly and keep truthful per-file outcomes.
+5. An old successful record is not proof that a destination still exists or is intact.
+6. Keep the architecture small, asynchronous where appropriate, and proportional to the problem.
+7. Never format drives, create partitions or recommend automatic deletion of a card.
+8. A verified import is not an independent backup.
 
-- Arquivos: JPEG (`.JPG`, `.JPEG`) e RAW Panasonic (`.RW2`).
+## Main flow
 
-- Mac: SSD interno de 1 TB; biblioteca principal em SSD externo dedicado de 500 GB.
+1. Connect the card/source and archive drive; manually choose authorized folders when needed.
+2. Discover files recursively, including DCIM; group RAW/JPEG representations of each capture.
+3. Filter by capture date, format and verified import state, then select photographs.
+4. Optionally name an event and preview every destination with photo/file counts, size and free space.
+5. Explicitly start the import, follow copy/verification progress, cancel if needed and review results.
+6. Review history, verify current destination content and explicitly prepare recovery of incomplete imports.
 
-- Uso: organizar fotos em pastas e visualizá-las pelo Finder/Preview.
+## Supported files, grouping and dates
 
-- Sessões podem conter 350+ fotografias, muitas com pares RAW+JPEG.
-
-  
-
-## Princípios
-
-1. Swift 6 + SwiftUI; APIs nativas primeiro.
-
-2. Biblioteca transparente, sem catálogo proprietário: arquivos acessíveis no Finder.
-
-3. Originais no SD são somente leitura: nunca mover, alterar ou apagar.
-
-4. Sem sobrescrita silenciosa; falhas e interrupções não produzem arquivos finais incompletos.
-
-5. Interfaces simples, operações assíncronas e arquitetura proporcional ao problema.
-
-6. Sem serviços em nuvem, sincronização com Google Fotos/Fotos da Apple ou gerenciamento de backup.
-
-  
-
-## Fluxo principal
-
-1. Conectar cartão SD e SSD externo.
-
-2. Escolher origem (volume ou pasta) e biblioteca de destino.
-
-3. Descobrir arquivos de imagem, inclusive dentro de `DCIM`.
-
-4. Agrupar RAW e JPEG da mesma captura em uma fotografia visual.
-
-5. Filtrar por data da captura, status de importação e formato; selecionar fotografias.
-
-6. Definir nome opcional do evento e pré-visualizar pastas e arquivos de destino.
-
-7. Exibir quantidade de fotografias, quantidade de arquivos, tamanho total e espaço disponível.
-
-8. Copiar diretamente do SD para o SSD externo, verificar a cópia e registrar o resultado.
-
-9. Mostrar resumo de sucesso, falhas ou importação parcial, sem recomendar apagar o SD automaticamente.
-
-  
+- JPEG (`.JPG`, `.JPEG`) and Panasonic RAW (`.RW2`), recognizing extension case variations.
+- Pair by source relative directory + case-preserved filename stem. Equal names in different directories
+  remain different captures. Retain every physical JPG/JPEG/RAW file; format filtering controls copying.
+- Prioritize EXIF DateTimeOriginal across the group, then digitized time, creation and modification dates.
+  At equal priority, prefer JPEG. Camera civil dates are not shifted by timezone conversion.
+- Identify fallback dates and unavailable previews. Never invent a capture date for an undated file.
+- RAW thumbnail/EXIF support depends on ImageIO and the camera; real-camera checks are separate from fixtures.
+- Keep the UI responsive for hundreds of captures. Do not claim universal camera/RAW support.
 
 ## Interface
 
-### Importar
+- **New Roll:** source and archive selectors, volume status, thumbnail grid, multi-selection, date/format
+  and not-yet-imported filters, event name, organization, preview, progress and per-file result.
+- **History / Previous Rolls:** recorded source/destination, dates, counts, states and errors; current
+  destination verification, explicit recovery and carefully scoped temporary inspection/cleanup.
+- **Settings:** authorized default archive/reconnection, default format/filter and year/format folder options.
+- Technical and safety wording must remain explicit; analog terminology must not obscure operations.
+- Use native SwiftUI controls, SF Pro, SF Symbols, semantic backgrounds, accessibility and light/dark support.
+- Brand colors: Ivory #F4EBDD, Charcoal #242424, Amber #C77736, Olive #8C9380. Use accents sparingly;
+  retain semantic success/error/warning colors. Photography remains the main visual content.
+- Original film-cartridge artwork is generated from repository-owned geometry and covered by MIT.
+  Cleanup of the superseded attachment from Git history needs separate approval.
+  See [branding](docs/BRANDING.md) and [assets](docs/ASSETS.md).
 
-- Seletor de origem; detecção de volumes removíveis, com escolha manual de pasta como alternativa.
+## Archive layout
 
-- Estado da biblioteca: conectada, desconectada, sem permissão, sem espaço.
-
-- Grade de miniaturas com seleção múltipla e carregamento assíncrono.
-
-- Um cartão visual por captura; indicadores `RAW`, `JPEG` ou `RAW + JPEG`.
-
-- Filtros: não importadas, intervalo de datas, formato e opcionalmente busca por nome.
-
-- Destino, organização, nome do evento, prévia e botão Importar.
-
-- Progresso, cancelamento e resumo por arquivo.
-
-  
-
-### Histórico
-
-- Importações com data, origem, destino, contagem de fotografias/arquivos, estado e erros.
-
-- RAW e JPEG registrados individualmente; importações parciais representadas corretamente.
-
-  
-
-### Preferências
-
-- Pasta da biblioteca padrão e reconexão.
-
-- Formato padrão (`RAW`, `JPEG`, ambos).
-
-- Organização por ano/data/evento e subpastas de formato.
-
-- Tratamento padrão de arquivos já importados.
-
-  
-
-## Organização padrão
+Default layout, relative to the selected archive root:
 
 ```text
-
-Fotografias/
-
 2026/
-
-2026-11-21 - Passeio/
-
-RAW/
-
-P1000561.RW2
-
-JPEG/
-
-P1000561.JPG
-
+└── 2026-11-21 - Photo walk/
+    ├── RAW/P100001.RW2
+    └── JPEG/P100001.JPG
 ```
 
-Se não houver evento, usar apenas a data. Preservar nomes originais. Não criar partições nem formatar unidades.
+The date folder is mandatory. Year and format subfolders are configurable; event naming is optional
+and per session. No event means date only. Original names remain unchanged. Recovery preserves recorded
+paths regardless of current settings. Do not add a roll index or proprietary archive metadata.
 
-  
+## Safety requirements
 
-## Regras de identificação
+- Reject overlapping source/archive/journal roots and unsafe relative paths, links and naming collisions.
+- Check permissions/capacity and root/file/volume identities before and during copying.
+- Create an exclusive temporary file in the final parent; hash while copying, synchronize and reread it
+  to verify size and SHA-256. Publish only with a rename that refuses replacement; require synchronization.
+- Preserve conflicting files. Existing content needs full verification before marking it already imported.
+- Journal intended paths before archive writes and record per-file results, including partial operations.
+- Handle cancellation, disconnection, out-of-space errors and unexpected termination conservatively.
+- Recovery/cleanup require explicit confirmation and identity checks; never remove unknown temporary files.
+- Store permissions using native security-scoped bookmarks; never reconnect solely by volume name or path.
+- Keep the existing bundle ID, preference keys, bookmark format, journal schemas and storage paths compatible.
 
-- Agrupar por diretório de origem + nome-base, sem confundir nomes iguais em pastas distintas.
+## Implementation and acceptance
 
-- Uma fotografia visual pode representar dois arquivos físicos; filtros de formato determinam quais arquivos serão copiados.
+Current deployment target is macOS 27.0. The verified toolchain is documented in [BUILDING.md](docs/BUILDING.md).
+Internal project/target/module remain PhotoImporter; app/executable are Roll. Use simple local JSON records
+and UserDefaults, native volume monitoring and scoped access. No external EXIF or imaging tools required.
 
-- Priorizar EXIF `DateTimeOriginal`/data de captura; documentar fallback para ausência ou erro de metadados.
+Use generated fixtures and disposable directories for recursive discovery, pairing, filters, counts,
+collision handling, read-only preview, verified copying, source preservation, interruption/retry,
+cleanup and reconnection tests. Simulated RAW files prove grouping, not decoding.
+Manual real-camera checks and hardware fault testing must be distinguished from automated tests.
+Future work remains incremental: one testable milestone at a time, with changes, evidence, limits and next step.
 
-- Histórico não é prova suficiente de que o arquivo ainda existe no destino. Revalidar presença e identidade antes de marcar como já importado.
+## Out of scope
 
-- Evitar falsos positivos em arquivos homônimos; propor estratégia de identidade proporcional (metadados, tamanho, fingerprint/checksum quando necessário).
-
-  
-
-## Requisitos de segurança
-
-- Confirmar que origem e destino não se sobrepõem de maneira perigosa.
-
-- Verificar permissão e espaço antes de importar; reavaliar falhas durante a operação.
-
-- Copiar para arquivo temporário no mesmo volume de destino; validar tamanho e preferencialmente SHA-256; concluir com renomeação segura.
-
-- Nunca substituir arquivo existente silenciosamente; tratar colisões de forma explícita.
-
-- Registrar sucesso somente após a validação; permitir retomar uma importação parcial sem duplicar arquivos íntegros.
-
-- Tratar cancelamento, remoção de unidade, falta de espaço e encerramento inesperado.
-
-- Exibir que importação verificada não equivale a backup independente; não implementar backup no aplicativo.
-
-  
-
-## Implementação técnica
-
-- Swift 6, SwiftUI, Foundation/FileManager e ImageIO/Quick Look quando suportarem os formatos.
-
-- Avaliar suporte real a miniaturas e EXIF de `.RW2` da G100D no macOS disponível; oferecer placeholder/fallback se necessário.
-
-- Monitoramento de volumes com APIs nativas; seleção manual deve sempre funcionar.
-
-- Persistência local simples para histórico e preferências; justificar antes de introduzir SwiftData/SQLite.
-
-- Persistir acesso à pasta escolhida de acordo com sandbox/distribuição, considerando security-scoped bookmarks quando aplicável.
-
-- Separar responsabilidades de descoberta, metadados/miniaturas, agrupamento, planejamento, cópia/verificação e histórico, sem arquitetura excessiva.
-
-- Não exigir ExifTool ou dependências externas no início.
-
-  
-
-## Testes e critérios de aceite
-
-- Testes com diretórios locais simulando SD e SSD, sem hardware obrigatório.
-
-- Descoberta recursiva; agrupamento correto de RAW+JPEG; nomes iguais em diretórios diferentes.
-
-- Filtro de datas e formatos; contagem correta de fotografias versus arquivos.
-
-- Cópia verificada; conflitos; destino ausente; espaço insuficiente; cancelamento e retomada.
-
-- Nenhum arquivo original alterado; nenhum arquivo final incompleto; histórico coerente com o destino.
-
-- Interface responsiva com centenas de fotos.
-
-- Teste manual com arquivos `.RW2` reais antes de assumir compatibilidade de preview.
-
-  
-
-## Entregas incrementais
-
-1. **Descoberta:** projeto compilável; escolha de pasta; varredura; agrupamento e grade de miniaturas.
-
-2. **Importação:** escolha de destino externo; filtros; planejamento; cópia segura e progresso.
-
-3. **Histórico:** persistência, detecção de duplicatas e recuperação de operações parciais.
-
-4. **Polimento:** preferências, reconexão de volumes, mensagens de erro, performance e testes adicionais.
-
-  
-
-## Fora de escopo
-
-- Edição de imagens, revelação RAW, notas, álbuns sociais ou favoritos na nuvem.
-
-- Integração com Google Fotos, Fotos da Apple, iCloud ou outros serviços.
-
-- Backup, sincronização, exclusão automática no SD, formatação de discos.
-
-- Catálogo proprietário, importação para Apple Photos, distribuição comercial e suporte amplo a formatos não testados.
-
-  
-
-## Questões para decidir na implementação
-
-- Versão mínima de macOS e modelo de assinatura/sandbox.
-
-- Estrutura de diretórios e estratégia de conflitos no destino.
-
-- Formato do histórico e identidade de arquivos importados.
-
-- Estratégia de pré-visualização de RW2 quando o sistema não oferecer suporte.
+Image editing or RAW development; proprietary catalogs; cloud, Google Photos, Apple Photos or iCloud
+integration; synchronization; telemetry/analytics; automated backup; card deletion; drive formatting;
+commercial distribution systems; broad unverified format support. Optional future ideas are not implemented
+features and must not be advertised as such.
