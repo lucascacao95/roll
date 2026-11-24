@@ -2,16 +2,15 @@
 
 Audit date: **2026-11-24**. Proposed first public source release: **v0.1.0**, build **3**.
 
-**Verdict: NOT READY FOR PUBLICATION.** Current-tree icon provenance is now resolved through original
-code-generated artwork, and final local build/tests passed again. The seven superseded image blobs still
-remain in both old commits. Publication is blocked on explicit approval and validation of the narrow
-history cleanup, then an approved push/remote CI and final maintainer review. Current code, documentation
-and original artwork are covered by the approved MIT license.
+**Verdict: NOT READY FOR PUBLICATION — local candidate ready for authorized private CI review.**
+The current icon and local history are sanitized, licensed and verified. The maintainer approved the narrow
+local history rewrite, not a push. The private remote still points to its old history; an explicitly approved
+exact-lease update, passing remote CI and final maintainer review are required before public visibility.
+No further local code/asset blocker is known. See [history verification](ICON_MIGRATION.md).
 
-During this follow-up, GitHub unexpectedly reported PUBLIC visibility. The maintainer explicitly requested
-keeping the repository private, so visibility was restored to PRIVATE and confirmed. No push, force push,
-tag, release or history rewrite was performed. Remote main remains b9be783. Prior public exposure/copies
-cannot be ruled out. See [icon inventory and cleanup plan](ICON_MIGRATION.md).
+The follow-up previously found PUBLIC visibility and restored PRIVATE under explicit instruction.
+This history-cleanup stage made no remote mutation: no push, force push, tag, release or visibility change.
+Possible downloads from the earlier public interval cannot be revoked by a local rewrite.
 
 ## Inspection and audit scope
 
@@ -42,17 +41,17 @@ No repository contents or private findings were submitted to an external scannin
 | Credentials/signing material | No matching tokens, private keys, provisioning profiles, team ID or bundled certificates found. DEVELOPMENT_TEAM is empty; signing is ad hoc. | Pass within scan scope |
 | Original scope's hardware context | Historical scope mentions a camera model and nonunique storage capacities. Current scope removes machine-specific context; old text remains in history. No serial numbers, volume UUIDs or real import data found. | Documented |
 | Legacy bundle identifier | local.lucas.PhotoImporter intentionally remains for sandbox, preferences and bookmark compatibility. It is not a credential; changing it would risk data/access continuity. | Accepted compatibility choice |
-| Personal photographs / EXIF / GPS | Historical binaries are old icon PNGs only. Current tree has 11 original icon PNGs and seven generated native captures, including About. Final metadata inspection found no GPS, serial, artist, owner, user-comment, IPTC or MakerNote fields. Legacy icon EXIF was dimensions/color only. | Pass within metadata inspection scope |
+| Personal photographs / EXIF / GPS | The original pre-cleanup history contained only icon PNGs; sanitized local image history now uses the original repository artwork. Current tree has 11 original icon PNGs and seven generated native captures, including About. Final metadata inspection found no GPS, serial, artist, owner, user-comment, IPTC or MakerNote fields. Legacy icon EXIF was dimensions/color only. | Pass within metadata inspection scope |
 | Local imports/bookmarks/preferences | No real records, bookmark payloads or user defaults files are tracked. Tests construct their own state. App records do contain private paths at runtime and must remain local. | Pass |
 | Ignored generated files | Existing local DMGs/build products stay under ignored build/. Expanded ignore rules protect logs, app bundles, caches, personal Xcode state, signing material and local data. No existing tracked build/user-state file needed removal. | Corrected |
 | Current icon origin and rights | Replaced all native slots and the README preview with original Core Graphics geometry defined in scripts/GenerateAppIcon.swift. No input images/external artwork. Source and outputs covered by approved MIT. | Resolved in current tree |
-| Historical icon bytes | Seven old blobs through eleven paths remain reachable from both old commits. Exact inventory and minimal replacement plan in ICON_MIGRATION.md. | BLOCKER pending rewrite approval |
+| Historical icon bytes | Approved replacement completed locally: seven old blobs absent from all reachable refs and the cleaned object database; metadata/code invariants verified. Original remote/backup copies remain private and excluded from publication. | Resolved locally; remote update gated |
 | Repository visibility | Found PUBLIC on follow-up, restored PRIVATE under explicit instruction, confirmed via API and SSH remote SHA. Unknown earlier exposure; cannot revoke external copies. | Contained; residual exposure documented |
 
 Audit only covers reachable history/current candidates. Before publication, review any newly added branches,
 tags, artifacts or release attachments. Ignoring a file does not remove an already tracked historical copy.
-No history rewrite is necessary for the approved Git identity. The proposed narrow icon-blob replacement
-is documented in ICON_MIGRATION.md; it has not been executed. Approval is required before rewriting or pushing.
+No history rewrite is necessary for the approved Git identity. The approved narrow icon-blob replacement
+was completed locally and verified as documented in ICON_MIGRATION.md. Any push needs separate approval.
 
 ## Operational safety and code quality
 
@@ -88,7 +87,7 @@ nonblocking storage access or formal concurrency verification is made.
 
 ## Build and test evidence
 
-Reran `./scripts/check.sh` after icon replacement successfully, exit status 0, on macOS **27.0.1** (26A434), Apple Silicon **arm64**,
+Reran `./scripts/check.sh` in the sanitized isolated clone successfully, exit status 0, on macOS **27.0.1** (26A434), Apple Silicon **arm64**,
 Xcode **27.0** (27A266a), Apple Swift **6.4**, macOS 27 SDK and Swift 6 language mode.
 
 | Check | Actual result |
@@ -111,7 +110,7 @@ with AppIcon metadata/resources and both en/pt-BR localizations. Its signature i
 and inspection shows the runtime flag plus sandbox, user-selected read/write and app-scope bookmark
 entitlements, without get-task-allow or temporary test access exceptions. About reads its version from the bundle.
 
-Local full-check log: /tmp/roll-final-check.log (not committed; contains machine paths).
+Local full-check log: /tmp/roll-clean-history-check.log (not committed; contains machine paths).
 Generated build/results stay in ignored build/CheckDerivedData. Initial failed fixture log is also local;
 only the final corrected script run is counted as passing. Do not upload raw logs or xcresult bundles blindly.
 Build reproducibility here means source + documented toolchain + shared scheme + no unpinned package dependencies;
@@ -130,8 +129,9 @@ approved. Pattern scans are limited; no external scanner or reverse-image servic
 
 All **18 current PNGs** (11 new icon/source files and 7 captures) and the 11 legacy icon files in the ignored
 backup decoded through ImageIO without detected GPS, serial, artist, owner, user-comment, IPTC or MakerNote
-fields. No old-image blob exists in current publication files; all seven remain reachable from the two old
-commits, intentionally pending approval. Local details are in ignored build/IconAudit/final-privacy-audit.json.
+fields. No old-image blob exists in current publication files. The newly approved history cleanup removes all
+seven from every local reachable ref and the cleaned object database; original remote/backup copies remain private. Initial scan details are in ignored build/IconAudit/final-privacy-audit.json; post-rewrite verification is
+in build/IconAudit/clean-history-audit.json, with the history map stored separately from the publication refs.
 
 Regenerating the new icon reproduced all eleven PNG checksums on this toolchain. Rebuilt normal Release and
 demo bundles share the new compiled icon fingerprint, different from the old one. Existing old DMGs remain
@@ -167,7 +167,7 @@ not establish absence of previous downloads/clones. Remote main is unchanged.
 Verified `gh` is installed/authenticated with active personal account **lucascacao95**. Repository owner type
 is **User**, not an organization. Existing repository: **lucascacao95/roll**, private, default branch **main**,
 origin using SSH. Local Git email is personal, and matches both author and committer in both existing commits.
-No global Git configuration was changed. This preparation remains uncommitted for local review. No remote content changes occurred.
+No global Git configuration was changed. Preparation and the cleanup report are committed locally with the approved personal email. No remote content changes occurred.
 The follow-up visibility restoration is explicitly recorded above; the earlier private-state snapshot was stale.
 
 Prepared metadata (not applied remotely):
@@ -176,7 +176,7 @@ Prepared metadata (not applied remotely):
 - Description: A native macOS app for importing, organizing and preserving photographs. Built for photography enthusiasts, inspired by analog photography.
 - Topics: macos, swift, swiftui, photography, photo-importer, raw-photography, photo-management, macos-app, open-source, file-management.
 - Visibility: private now; public only after approval and resolution of the asset gate.
-- License: MIT for current code/documentation/original art; superseded historical art still needs removal.
+- License: MIT for current code/documentation/original art; superseded art removed locally; private remote update pending.
 - Default branch: main. Initial release: v0.1.0, still unreleased.
 
 Preliminary public-name search found other photography products using Roll, including
@@ -190,7 +190,7 @@ confusion before commercial distribution; no rename or paid legal work was initi
 
 | Priority | Item | Closure criterion |
 | --- | --- | --- |
-| BLOCKER | Historical icon cleanup approval | Approve the precise seven-blob replacement in ICON_MIGRATION.md; preserve development commit metadata, verify old IDs unreachable and rerun audit/tests. Current icon rights are resolved. |
+| RESOLVED | Local historical icon cleanup | Explicit approval received; seven blobs replaced, commit metadata/code preserved, local object/ref checks and sanitized-clone validation passed. |
 | BLOCKER | Public/remote authorization | Maintainer approves the concrete diff and authorizes push/visibility; separate approval for tags/releases or history rewrite. |
 | IMPORTANT | First remote CI | After approved push, confirm the actual GitHub run passes; image availability and local checks alone are not a remote result. |
 | IMPORTANT | Private security reporting | Enable GitHub private vulnerability reporting before public launch, or confirm the documented private contact channel works. |
@@ -201,7 +201,7 @@ confusion before commercial distribution; no rename or paid legal work was initi
 | OPTIONAL | Wider compatibility/performance | Assessment complete: macOS 14 + universal compiles; macOS 13 blocked by Observation. Runtime support needs a separately approved validation milestone. Deployment remains 27.0. |
 | OPTIONAL | Public binary | Decide separately on Developer ID, notarization, costs, Gatekeeper messaging and ZIP/DMG assets. |
 
-Before publication: approve and validate historical icon cleanup; review the new art and current diff; rerun validation
+Before publication: review the completed historical icon cleanup; review the new art and current diff; rerun validation
 after any source/asset changes; verify local Git identity; approve remote actions; run CI; enable private
 reporting; review public README/license/rendered links; only then approve visibility change. No automatic
 release, binary distribution, paid service or certificate use is configured.
@@ -212,9 +212,8 @@ The previous normal-push instructions are superseded: a normal new commit would 
 reachable. Follow the precise [ICON_MIGRATION.md](ICON_MIGRATION.md) plan instead.
 
 1. Review the new artwork, final diff, approved personal Git identity and validation evidence.
-2. Obtain explicit authorization for the narrow local historical rewrite. No rewrite has been done even
-   in a throwaway clone. Preserve a separate private backup, clean only the seven binary IDs, compare
-   commit metadata/code and validate every reachable ref, current build/tests and privacy again.
+2. Completed: explicit authorization, private backup, isolated seven-blob replacement, exact metadata/code
+   comparisons and checks of every reachable ref/current files. No unrelated source changes were introduced.
 3. Obtain separate authorization for the reviewed commits and exact-lease push while PRIVATE. Recheck
    remote main against the expected SHA before pushing. Do not use a force/mirror push or change global config.
 4. Inspect and wait for the actual CI run. The workflow is prepared and locally validated, not remotely proven.
@@ -271,5 +270,38 @@ scripts/tests/DiscoveryAlias.swift.
 
 Intentionally unchanged: Bundle Identifier, internal module/target/scheme names, source/archive layout rules,
 bookmark and preference formats, persisted raw values, JSON schema versions, journal path, safe-copy engine,
-user original files and Git history. Icon pixels were replaced with original art; remote visibility was
-restored to private under explicit instruction. No other remote setting or content was changed.
+user original files and import behavior. Icon pixels were replaced with original art; historical image
+blobs were replaced under explicit approval, preserving all commit metadata and non-image trees. The earlier
+visibility restoration was the only remote mutation; no content update has been pushed.
+
+## Authorized history cleanup verification
+
+The two development commits are retained as a3af6e0 (formerly 7ca1cd0) and 9ab4ae7 (formerly b9be783).
+The preparation commit is aba477f (formerly 5928c79); its final tree is byte-identical before/after filtering.
+Only the eleven historical icon paths changed. Messages, author/committer names, approved personal email,
+author/committer timestamps and file modes were compared exactly. Seven old blobs are not reachable and
+cannot be loaded from the clean object database. git fsck passed. The complete map is in ICON_MIGRATION.md.
+
+An offline verified bundle, original Git directory and working-tree snapshot are stored outside publication
+refs in a separate private backup. The publication repository has no backup/replace/old-origin ref that
+could reintroduce those blobs. The origin URL remains configured; stale origin/main is intentionally absent.
+Do not fetch or merge the old remote history before the separately approved exact-lease push.
+
+A real remote CI result is still pending. This stage intentionally makes no public-readiness claim based
+solely on a local build and cannot remove copies from earlier external downloads or GitHub caches.
+
+### Temporary local fetch safeguard
+
+The stale origin/main ref and its upstream association were not restored. The origin URL is unchanged.
+A repository-local negative fetch refspec, `^refs/heads/main`, temporarily excludes the old remote main
+from ordinary fetches, preventing background tools from importing its unsanitized history. No global
+configuration was changed. After a separately approved exact-lease push confirms the sanitized remote
+SHA, remove only that negative refspec and restore normal upstream tracking; do not remove the guard
+and fetch the old history before the approved update.
+
+Post-rewrite validation passed on the clean serialized checkout: **95 XCTest cases**, **4 English
+localization cases**, the standalone /private/tmp regression, Debug/Release builds and strict Release
+signature verification. The privacy scan before the documentation status commit covered 94 reachable
+unique blob versions and 89 current files; no configured token/key, private home/volume path or file-content
+email pattern matched. All commit author and committer emails are the approved personal address.
+The seven old blob IDs are absent from both reachable refs and the clean object database.

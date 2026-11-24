@@ -22,7 +22,7 @@ No Git tag or GitHub release has been created.
 
 ### Asset and compatibility review
 
-- Replace the unverified supplied icon with original MIT-licensed code-generated artwork and document a narrow historical cleanup plan (not yet executed).
+- Replace the unverified supplied icon with original MIT-licensed code-generated artwork and sanitize only the seven old icon blobs with explicit approval, preserving development commit metadata.
 - Confirm an analysis-only macOS 14 universal build and macOS 13 Observation availability failure; supported requirements remain unchanged.
 
 ### Fixed during release preparation
@@ -32,4 +32,4 @@ No Git tag or GitHub release has been created.
 
 ### Known publication gate
 
-- Obtain approval for removal of the seven superseded icon blobs from historical commits, then validate the cleaned history before an approved private push/CI.
+- Obtain separate approval for the reviewed exact-lease private push, pass remote CI, and complete maintainer review before public visibility.

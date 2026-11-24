@@ -42,8 +42,7 @@ external assets. The preview is [branding/roll-icon.png](branding/roll-icon.png)
 Both configurations retain ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon.
 
 The generator and its outputs are covered by the project's approved MIT license. This replaces the supplied
-attachment, whose provenance could not be established. Historical copies remain pending approved cleanup;
-see [ASSETS.md](ASSETS.md) and [migration inventory](ICON_MIGRATION.md).
+attachment, whose provenance could not be established. Local history has been sanitized with explicit approval; the private remote update remains gated. See [ASSETS.md](ASSETS.md) and [migration inventory](ICON_MIGRATION.md).
 
 Visual direction: charcoal 35 mm cartridge, amber label, ivory background, perforated strip, restrained
 olive detail and subtle depth. No manufacturer logos, generic cameras, download arrows, external fonts or

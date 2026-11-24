@@ -1,6 +1,38 @@
 # App icon replacement and history cleanup plan
 
-Status: **current-tree replacement complete; historical rewrite NOT authorized or executed**.
+Status: **local historical rewrite authorized and completed; no push authorized or executed**.
+
+## Execution result
+
+The maintainer explicitly approved replacing only the seven old image blobs while preserving commit
+metadata, with no push. Preparation was committed locally as 5928c79, then a fresh isolated clone was
+filtered using a pinned upstream git-filter-repo tool. No shared object alternates were used.
+
+| Original commit | Sanitized commit | Verification |
+| --- | --- | --- |
+| 7ca1cd0d51e3f32791b4adb0c738980bfc6a20c5 | a3af6e00ab4744ec3f5634201b10b42e4aa03842 | Only eleven icon paths changed; author/committer identities, dates and message identical. |
+| b9be783d46f7dbae0101a83e10b26a7e69077541 | 9ab4ae7202a4a6a66df97f701ba067e5d0219960 | Only eleven icon paths changed; author/committer identities, dates and message identical. |
+| 5928c79524ba62fb092f45e021ff34163526b309 | aba477f858bb8bf98bf17f1cf8c6a53380c362a3 | Preparation tree unchanged; parent hashes necessarily changed; commit metadata identical. |
+
+Raw commit metadata was compared byte-for-byte after excluding only tree/parent headers. Every path,
+file mode and non-icon object ID was compared. The final preparation tree ID is identical before/after.
+All seven old IDs are absent from reachable refs and cannot be found with git cat-file in the cleaned
+object database. git fsck passed. A private verified Git bundle and working-tree snapshot were created
+outside the publication repository; the original Git directory is retained there when installing the
+clean history. Backups are deliberately not represented by a branch, tag or replace ref in the clean repo.
+
+Pinned tool source: newren/git-filter-repo at d7b75aca907380f608892cc289e616f195427b99.
+No global tool installation or Git configuration change was made. Tool/check details and verification
+maps are in ignored build/IconAudit and the separate private backup. Backup paths are not public documentation.
+
+Remote main remains b9be783 and PRIVATE. It still needs an explicitly authorized exact-lease update, then
+real remote CI and final maintainer review. Do not fetch/merge the old remote history into this sanitized
+repository before that update; doing so would make the old blobs reachable again. The stale local
+origin/main tracking ref is intentionally omitted; the origin URL is retained. No force push has occurred.
+
+The inventory and plan below record the pre-cleanup state and approved strategy, not a claim that old
+pixels still exist in the local publication history. Historical provisional filenames/text remain, but
+those image bytes are now the original repository artwork. Old remote/backup copies are not a license grant.
 
 ## Decision and provenance
 
@@ -13,9 +45,9 @@ slot filenames, persistence and import behavior remain unchanged.
 
 The previous files were copied into ignored build/IconAudit/previous-artwork for local reference before
 replacement. This is a quarantine/reference copy, not a release input. It must not be staged or distributed.
-The old artwork and local installers were not destructively deleted, and no Git objects/refs were rewritten.
+The old artwork and local installers were not destructively deleted, during the initial icon replacement. The subsequent local rewrite is recorded above.
 
-## Current and historical occurrences
+## Pre-cleanup occurrence inventory
 
 | Location | Finding and disposition |
 | --- | --- |
@@ -33,7 +65,7 @@ The old artwork and local installers were not destructively deleted, and no Git 
 
 ### Exact old blobs
 
-Every blob below is reachable from both existing commits:
+Before cleanup, every blob below was reachable from both original commits:
 `7ca1cd0d51e3f32791b4adb0c738980bfc6a20c5` and
 `b9be783d46f7dbae0101a83e10b26a7e69077541`.
 
@@ -92,7 +124,7 @@ The period of public exposure is unknown. Making the repository private does not
 clones, downloads, forks or cached views. The cleanup below can remove old art from the history we publish
 next; it cannot prove the old bytes were never downloaded or erase someone else's copy.
 
-## Recommended narrow historical cleanup — approval required
+## Approved narrow historical cleanup strategy
 
 Because there are only two existing commits and no tags, retain the development chronology rather than
 squashing into a new orphan root. Use git-filter-repo in a fresh isolated local clone, with a callback that
@@ -143,4 +175,13 @@ A future force-with-lease command must use the freshly verified old remote SHA. 
 git push --force-with-lease=refs/heads/main:<approved-old-remote-sha> origin refs/heads/main:refs/heads/main
 ```
 
-This is a reviewable plan, not an executed rewrite or approval to push.
+The narrow local rewrite above is complete. The future push command remains unexecuted and requires separate approval.
+
+### Temporary local fetch safeguard
+
+The stale origin/main ref and its upstream association were not restored. The origin URL is unchanged.
+A repository-local negative fetch refspec, `^refs/heads/main`, temporarily excludes the old remote main
+from ordinary fetches, preventing background tools from importing its unsanitized history. No global
+configuration was changed. After a separately approved exact-lease push confirms the sanitized remote
+SHA, remove only that negative refspec and restore normal upstream tracking; do not remove the guard
+and fetch the old history before the approved update.

@@ -60,7 +60,6 @@ This is not an editor, catalog or backup system.
 - Brand colors: Ivory #F4EBDD, Charcoal #242424, Amber #C77736, Olive #8C9380. Use accents sparingly;
   retain semantic success/error/warning colors. Photography remains the main visual content.
 - Original film-cartridge artwork is generated from repository-owned geometry and covered by MIT.
-  Cleanup of the superseded attachment from Git history needs separate approval.
   See [branding](docs/BRANDING.md) and [assets](docs/ASSETS.md).
 
 ## Archive layout

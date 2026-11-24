@@ -113,7 +113,7 @@ critical import, conflict and recovery paths using disposable directories.
 - Duplicate filtering verifies recorded paths and their current content; it does not index the entire archive.
 - Copies preserve file bytes, including embedded EXIF/GPS if present. Roll is not a metadata scrubber.
 - Accessibility and the revised UI still need complete manual keyboard/VoiceOver verification.
-- The current icon is original code-generated artwork; cleanup of the previous attachment in Git history still requires approval.
+- The icon is original code-generated artwork; the local history has been sanitized. The private remote update and CI review are still pending.
 - Local DMGs are ad hoc signed, without Developer ID signing or Apple notarization.
 
 See the [release readiness report](docs/RELEASE_READINESS.md) for evidence and remaining gates.
@@ -134,5 +134,5 @@ bookmarks or real import records to a public issue.
 ## License
 
 Current code, documentation and original code-generated artwork are licensed under the [MIT License](LICENSE).
-See [asset provenance](docs/ASSETS.md). An older attached image remains in historical commits;
-public publication is gated on the approved [history cleanup](docs/ICON_MIGRATION.md).
+See [asset provenance](docs/ASSETS.md) and the completed local [history cleanup](docs/ICON_MIGRATION.md).
+The remote remains private pending an approved update, remote CI and final publication review.

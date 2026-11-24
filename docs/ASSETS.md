@@ -28,18 +28,23 @@ packages or network requests. Generated content contains no personal photography
 bookmarks, paths or user data. Check dimensions, small-size appearance and final bundle resources after
 regeneration. Rasterization/PNG encoding can vary with the OS; the geometry and inputs are versioned.
 
-## Superseded attachment — history cleanup pending
+## Superseded attachment — local history sanitized
 
 The former `docs/branding/roll-provisional-source.png` was a supplied conversation attachment; its
 creator, original service/account and redistribution terms could not be verified. Temporary-use approval
 did not establish those rights. It has been removed from the current tree, and all ten app slots now
 contain the new artwork. No rights in the old image are asserted by the current MIT license.
 
-Two existing commits still reference seven unique old PNG blobs through eleven paths. Replacing the
-current image does not remove them from history. See [ICON_MIGRATION.md](ICON_MIGRATION.md) for exact IDs,
-all paths, affected artifacts and the proposed narrow history rewrite. That rewrite and any force push
-require explicit approval. Old ignored local DMGs/bundles are retained for inspection and must not be
-published or reused as release assets. No destructive cleanup was performed.
+With explicit authorization, seven exact old PNG blobs were replaced in a fresh isolated clone,
+preserving the two development commits' code and metadata. The eleven historical paths remain for old
+catalog/README compatibility but now contain original repository-generated artwork. No old image blob is
+reachable or present in the sanitized local object database. See [ICON_MIGRATION.md](ICON_MIGRATION.md)
+for the commit map, byte-level checks, separate private backup and pending remote-update safeguards.
+
+The unmodified remote remains private and still has the previous history until an approved exact-lease push.
+Private legacy backups and ignored old DMGs/bundles must not be published or reused as release assets.
+The current MIT grant does not assert rights in those old copies, nor erase possible earlier external downloads.
+No destructive cleanup, force push or public visibility change accompanied the local history rewrite.
 
 ## Demo illustrations and native captures
 

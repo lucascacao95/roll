@@ -22,7 +22,8 @@ SOFTWARE.
 
 Historical asset notice
 
-This grant includes the current original code-generated artwork. It does not
-establish rights in the superseded supplied image still present in historical
-commits. That image must be removed from the public history before publication.
+This grant includes the original code-generated artwork in the current tree
+and sanitized local history. It does not establish rights in the superseded
+supplied image retained only in private legacy backups and the remote history
+pending its approved update. Those old copies are not publication assets.
 See docs/ASSETS.md and docs/ICON_MIGRATION.md.
