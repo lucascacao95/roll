@@ -2,302 +2,299 @@
 
 **roll.** — *From capture to collection.*
 
-Utilitário nativo de macOS para importar fotografias de cartões SD e pastas para um acervo convencional.
-Inglês como idioma de desenvolvimento e suporte a português brasileiro. Diretrizes de marca, compatibilidade
-e direção do ícone definitivo estão em [docs/BRANDING.md](docs/BRANDING.md).
-O escopo do produto está em [PROJECT_SCOPE.md](PROJECT_SCOPE.md).
+A native macOS utility for importing photos from SD cards and folders into a conventional file archive.
+English is the development language, with Brazilian Portuguese localization. Branding guidelines,
+compatibility decisions and the direction for the final icon are documented in [docs/BRANDING.md](docs/BRANDING.md).
+The product scope is defined in [PROJECT_SCOPE.md](PROJECT_SCOPE.md).
 
-## Estado atual: identidade Roll e localização
+## Current status: Roll identity and localization
 
-A versão 0.1.1 inclui o ícone provisório aprovado: a primeira imagem do cartucho de filme,
-com todos os tamanhos nativos em `PhotoImporter/Assets.xcassets/AppIcon.appiconset`.
-Finder, Dock e Sobre usam o mesmo ícone. A arte definitiva continua pendente.
+Version 0.1.1 includes the approved provisional icon: the first film cartridge image,
+with all native sizes in `PhotoImporter/Assets.xcassets/AppIcon.appiconset`.
+Finder, Dock and About use the same icon. The final artwork is still pending.
 
-- Escolha manual de uma pasta ou cartão pelo seletor nativo; lista de volumes externos detectados.
-- Preferências persistentes de formato, filtro de importadas e organização de pastas.
-- Biblioteca padrão salva com bookmark de acesso e verificação de identidade ao reconectar.
-- Descoberta recursiva de JPG, JPEG e RW2, inclusive em DCIM.
-- Um cartão visual por diretório relativo + nome-base, com indicação RAW/JPEG.
-- Nomes-base preservam maiúsculas/minúsculas. Extensões são reconhecidas sem distinguir caixa.
-- JPG e JPEG do mesmo nome-base são mantidos; nenhum arquivo é descartado pelo agrupamento.
-- Miniaturas assíncronas, respeitando orientação, com decodificação serial e cache limitado.
-- Preview tenta todos os JPEGs do grupo antes de tentar RAW via ImageIO; falhas usam placeholder.
-- Leitura de datas por arquivo; uma data representativa por fotografia visual, com origem identificada.
-- Seleção por cartão, ações para selecionar visíveis/limpar e contagem de fotografias, arquivos e bytes.
-- Filtros combinados de formato e intervalo inclusivo de dias.
-- Erros de leitura são exibidos como resultado parcial.
-- Cancelamento e troca de origem; arquivos ocultos, pacotes e links simbólicos são ignorados.
-- Escolha da pasta da biblioteca, nome opcional do evento e prévia por arquivo.
-- Verificação de caminhos, arquivos existentes, conflitos, disponibilidade e espaço livre.
-- A prévia permanece somente leitura. O botão Importar habilita cópia verificada para a biblioteca.
-- Cópia em blocos, temporários exclusivos no destino, SHA-256, finalização sem sobrescrita e progresso.
-- Cancelamento, resumo individual de RAW/JPEG e nova tentativa verificando conteúdo já existente.
-- Registro local JSON por operação, com estado, identidade das raízes/volumes e resultado por arquivo.
-- Histórico visual com resultado registrado e conferência atual do destino por tamanho/SHA-256.
-- Preparação de retomada após confirmar origem e biblioteca, preservando caminhos e cópias íntegras.
-- Inspeção e remoção confirmada de temporários com identidade registrada, protegendo operações ativas.
-- Filtro de arquivos não importados nesta biblioteca, incluindo pares parcialmente importados.
+- Manual folder or card selection through the native picker, with a list of detected external volumes.
+- Persistent defaults for format, imported-file filtering and folder organization.
+- Default archive saved with an access bookmark and identity verification on reconnection.
+- Recursive discovery of JPG, JPEG and RW2 files, including inside DCIM.
+- One visual card per relative directory and filename stem, with RAW/JPEG indicators.
+- Filename stems preserve case. Extensions are recognized without case sensitivity.
+- JPG and JPEG files sharing a stem are both retained; grouping never discards a file.
+- Asynchronous, orientation-aware thumbnails with serial decoding and a bounded cache.
+- Preview attempts every JPEG in the group before trying RAW through ImageIO; failures use a placeholder.
+- Per-file date reading, with one representative date per visual photo and an identified date source.
+- Card selection, select-visible/clear actions, and photo, file and byte counts.
+- Combined format and inclusive date-range filters.
+- Read errors displayed alongside partial results.
+- Cancellation and source switching; hidden files, packages and symbolic links are skipped.
+- Archive folder selection, an optional event name and a per-file import preview.
+- Checks for paths, existing files, conflicts, availability and free space.
+- A read-only preview. The Import Roll button starts verified copying into the archive.
+- Block-based copying, exclusive destination temporary files, SHA-256, finalization without overwriting and progress.
+- Cancellation, individual RAW/JPEG results and retries that verify existing content.
+- One local JSON record per operation, including state, root/volume identities and per-file results.
+- Visual history showing recorded results and current destination checks by size and SHA-256.
+- Recovery preparation after confirming source and archive, preserving paths and intact copies.
+- Inspection and confirmed removal of temporary files with recorded identities, protecting active operations.
+- A filter for files not yet imported into the archive, including partially imported pairs.
 
-## Datas, filtros e seleção
+## Dates, filters and selection
 
-A prioridade de data é aplicada ao grupo inteiro: EXIF `DateTimeOriginal`, EXIF `DateTimeDigitized`,
-criação do arquivo e modificação do arquivo. Dentro da mesma prioridade, preferir JPEG;
-entre arquivos do mesmo formato, usar a ordem do caminho relativo. Isso permite, por exemplo,
-usar EXIF do RAW antes da criação do JPEG. Datas inválidas são ignoradas e os fallbacks
-são identificados no cartão. O detalhe ao passar o cursor mostra horário, origem e arquivo usado.
+Date priority applies to the entire group: EXIF `DateTimeOriginal`, EXIF `DateTimeDigitized`,
+file creation and file modification. At the same priority, JPEG is preferred;
+files of the same format are ordered by relative path. This allows RAW EXIF, for example,
+to take precedence over a JPEG's creation date. Invalid dates are ignored and fallback dates
+are identified on the card. The tooltip shows the time, date source and file used.
 
-O dia e horário EXIF são preservados como valores civis da câmera, sem conversão de fuso,
-inclusive quando há offset EXIF. Datas do filesystem usam o fuso local do Mac no momento
-da descoberta. O intervalo de filtro compara dias gregorianos e inclui os dias inicial e final.
-Fotografias sem data válida aparecem sem filtro de data e ficam ocultas quando ele está ativo.
-O intervalo inicial abrange todas as datas disponíveis da descoberta.
+EXIF date and time are preserved as the camera's civil date/time values, without time zone conversion,
+even when an EXIF offset is present. Filesystem dates use the Mac's local time zone at scan time.
+The date filter compares Gregorian calendar days and includes both endpoints.
+Photos without a valid date appear when date filtering is disabled and are hidden when it is enabled.
+The initial range covers all available dates from the scan.
 
-Formato define os arquivos elegíveis, sem separar o cartão do par: 10 pares selecionados
-representam 10 fotografias/20 arquivos em Todos e 10 fotografias/10 arquivos em JPEG ou RAW.
-Se um grupo contiver JPG e JPEG, ambos continuam elegíveis no formato JPEG.
-Os indicadores RAW/JPEG do cartão mostram os formatos existentes, independentemente do filtro.
+Format determines eligible files without splitting a pair into separate cards: 10 selected pairs
+represent 10 photos/20 files with RAW + JPEG, or 10 photos/10 files with JPEG or RAW.
+If a group contains both JPG and JPEG files, both remain eligible in JPEG mode.
+The card's RAW/JPEG indicators show the available formats regardless of the filter.
 
-A seleção começa vazia. Mudar filtros desmarca fotografias que deixaram de estar visíveis;
-ampliar filtros não as seleciona novamente. Trocar de origem limpa seleção e filtros.
-Não há seleção oculta. Todas as contagens e tamanhos consideram os arquivos elegíveis.
+Selection starts empty. Changing filters deselects photos that are no longer visible;
+broadening a filter does not select them again. Switching sources clears selection and resets filters.
+There is no hidden selection. All counts and sizes reflect eligible files.
 
-### Não importadas nesta biblioteca
+### Not yet imported into this archive
 
-Depois de escolher a biblioteca, ative **Não importadas nesta biblioteca**. O aplicativo lê os registros
-locais, calcula o SHA-256 da origem quando há referências candidatas e confere o conteúdo existente
-no destino. Só arquivos cuja origem e destino correspondam são ocultados. Nome, tamanho ou registro
-de sucesso isolados não bastam. Erros, arquivos sem referência, registros corrompidos e arquivos ausentes
-ou alterados permanecem visíveis; observações da verificação ficam disponíveis abaixo do filtro.
-Não há varredura/catalogação de toda a biblioteca: a consulta utiliza caminhos registrados.
+After choosing an archive, enable **Not yet imported into this archive**. Roll reads local records,
+calculates source SHA-256 checksums when candidate references exist, and verifies the content currently
+at the destination. Only files with matching source and destination content are hidden. A matching name,
+size or recorded success alone is insufficient. Errors, files without references, corrupt records,
+and missing or changed files remain visible; verification notes appear below the filter.
+There is no scan or catalog of the entire archive: verification uses recorded paths.
 
-O filtro age por arquivo físico. Se o JPEG de um par estiver íntegro e o RAW ainda faltar, o cartão
-continua visível com apenas o RAW elegível em Todos/RAW; em JPEG ele fica oculto. Contagens, tamanhos
-e planejamento consideram somente arquivos elegíveis. A data representativa original do par é mantida
-mesmo quando o JPEG é excluído da seleção pelo filtro.
+The filter works per physical file. If a pair's JPEG is intact but its RAW is missing, the card
+remains visible with only RAW eligible in RAW + JPEG/RAW mode; it is hidden in JPEG mode.
+Counts, sizes and planning consider only eligible files. The pair's original representative date
+is retained even when filtering excludes its JPEG.
 
-A verificação é refeita ao ativar o filtro e antes de gerar a prévia. Após alterações externas,
-use **Atualizar verificação**. Até terminar a conferência, arquivos não verificados ficam visíveis.
-O horário mostrado identifica o instante da verificação; mudanças externas ainda não são monitoradas.
+Verification runs when the filter is enabled and again before generating an import preview.
+After external changes, use **Refresh Verification**. Files remain visible until they have been verified.
+The displayed time identifies when verification occurred; external file changes are not monitored.
 
-## Biblioteca e prévia da importação
+## Archive and import preview
 
-Escolha uma pasta existente usando **Escolher biblioteca…**. Essa pasta é a raiz da biblioteca;
-não será acrescentado outro nível `Fotografias`. Pastas locais são permitidas para testes,
-e a prévia identifica se o volume é interno ou externo quando essa informação estiver disponível.
-O seletor da biblioteca não permite criar pastas nesta etapa.
+Choose an existing folder through the archive selector. This folder is the archive root;
+Roll does not add another `Fotografias` directory. Local folders are allowed for testing,
+and the preview identifies internal or external volumes when that information is available.
+The archive picker does not allow folder creation at this stage.
 
-Com fotografias selecionadas, informe opcionalmente o evento e clique em **Gerar prévia**.
-A janela mostra origem relativa, destino relativo à biblioteca, formato, tamanho e estado de cada arquivo.
-Exemplo para uma biblioteca já chamada `Fotografias`:
+With photos selected, optionally enter an event name and click **Review Roll**.
+The window shows each file's relative source, destination relative to the archive, format, size and state.
+For example, with an archive already named `Fotografias` and an event named `Passeio`:
 
 ```text
 Fotografias/2026/2026-11-21 - Passeio/RAW/P100001.RW2
 Fotografias/2026/2026-11-21 - Passeio/JPEG/P100001.JPG
 ```
 
-Sem evento, a pasta da sessão é somente a data. Uma seleção com vários dias gera uma pasta por dia.
-O par utiliza a mesma data representativa, mesmo quando apenas RAW ou JPEG está elegível.
-Fotografias sem data válida ficam com pendência, sem destino inventado; desmarque-as para continuar.
+Without an event, the session folder contains only the date. A selection spanning multiple days creates
+one folder per day. A pair uses the same representative date even when only RAW or JPEG is eligible.
+Photos without a valid date are flagged without inventing a destination; deselect them to continue.
 
-Os nomes originais são preservados. O evento tem espaços externos aparados, e nomes perigosos ou
-incompatíveis são rejeitados, sem substituir caracteres automaticamente. É aplicada uma política
-conservadora para separadores, caracteres de controle, ponto/espaço final e limites de comprimento
-(255 bytes UTF-8 por componente; evento de até 242 bytes para caber junto da data).
+Original filenames are preserved. Leading and trailing event-name whitespace is trimmed, and unsafe or
+incompatible names are rejected without automatically replacing characters. A conservative policy applies
+to separators, control characters, trailing periods/spaces and length limits
+(255 UTF-8 bytes per component; an event name can use up to 242 bytes to fit alongside the date).
 
-Estados por arquivo:
+Per-file states:
 
-- **Novo:** caminho livre no momento da inspeção.
-- **Existe — verificar:** arquivo no destino; nome e tamanho não comprovam duplicidade.
-- **Pendência:** colisão entre selecionados, link simbólico, caminho inacessível/incompatível,
-  data ausente ou origem removida/alterada em tamanho desde a descoberta.
+- **New:** the path was available when inspected.
+- **Exists — verify:** a destination file exists; name and size do not prove a duplicate.
+- **Needs attention:** a collision between selected files, symbolic link, inaccessible/incompatible path,
+  missing date, or source file removed or changed in size since discovery.
 
-O planejamento rejeita origem e biblioteca iguais ou contidas uma na outra, resolvendo links nos
-ancestrais e comparando componentes de caminho. A comparação de sobreposição é conservadora para
-maiúsculas/minúsculas. Links na própria raiz selecionada ou em componentes existentes do destino
-são bloqueados, inclusive links quebrados. Arquivos ocupando o lugar de pastas também são bloqueados.
-Nomes de destino são comparados com normalização Unicode e as regras de caixa do volume;
-se a sensibilidade não puder ser obtida, assumir comparação sem distinção de caixa.
+Planning rejects a source and archive that are identical or nested inside one another, resolving ancestor
+links and comparing path components. Overlap comparisons are conservative about case.
+Links at the selected root or in existing destination components are blocked, including broken links.
+Files occupying folder paths are also blocked. Destination names are compared using Unicode normalization
+and the volume's case rules; if case sensitivity cannot be determined, comparisons are case-insensitive.
 
-O tamanho previsto inclui todos os arquivos elegíveis, inclusive existentes, até verificar seu conteúdo.
-Espaço desconhecido/insuficiente e volume somente leitura são indicados na prévia. A permissão
-efetiva de gravação não é testada durante a prévia.
-A prévia não cria arquivo/pasta de teste, não reserva espaço nem altera metadados no destino.
+The estimated size includes all eligible files, including existing files, until their content is verified.
+Unknown/insufficient space and read-only volumes are reported in the preview. Actual write access is not
+tested during preview. The preview creates no test file or folder, reserves no space and changes no
+destination metadata.
 
-Alterar seleção, filtros, evento, origem ou biblioteca descarta a prévia e cancela seu cálculo em andamento.
-Eventos de montagem, desmontagem e renomeação de volumes descartam descobertas e prévias antigas;
-escolha a origem novamente. Alterações de arquivos dentro de um volume não são monitoradas. Ao importar, caminhos, permissões, identidades e espaço são revalidados.
-O planejamento não calcula checksums nem declara arquivos como já importados.
+Changing selection, filters, event, source or archive discards the preview and cancels any calculation
+in progress. Volume mount, unmount and rename events discard previous scans and previews;
+choose the source again. Changes to files within a volume are not monitored. Importing revalidates
+paths, permissions, identities and space. Planning does not calculate checksums or declare files
+already imported.
 
-## Importação e nova tentativa
+## Importing and retrying
 
-Na prévia sem pendências, clique em **Importar**. A seleção e os controles ficam bloqueados durante
-a operação; é possível cancelar e acompanhar o arquivo atual e as etapas de cópia/verificação.
-O serviço de importação é serial e compartilhado entre as janelas do aplicativo.
+In a preview without unresolved issues, click **Import Roll**. Selection and controls are disabled during
+the operation; you can cancel and follow the current file through the copy and verification stages.
+The import service runs serially and is shared across application windows.
 
-Antes de copiar, revalidar identidade das pastas (dispositivo/inode), UUID dos volumes quando disponível,
-presença/tamanho/identidade e datas de alteração dos arquivos de origem, sobreposição e capacidade atual.
-Mudanças desde a prévia exigem nova descoberta/prévia. A criação real do temporário verifica o acesso
-de escrita; falhas de permissão, desconexão ou espaço são registradas. O espaço também é reconsultado
-por arquivo. Na nova tentativa, arquivos agora existentes são excluídos da estimativa de espaço de cópia,
-mas continuam sujeitos à comparação de conteúdo.
+Before copying, Roll revalidates folder identities (device/inode), volume UUIDs when available,
+source file presence, size, identity and change timestamps, overlap, and current capacity.
+Changes since preview require a new scan/preview. Creating the actual temporary file tests write access;
+permission, disconnection and space failures are recorded. Available space is also checked per file.
+On retry, files that now exist are excluded from the copy-space estimate but still undergo content comparison.
 
-O percurso de pastas e os arquivos são abertos por descritores com `O_NOFOLLOW`; a origem usa somente
-aberturas de leitura. No destino, criar temporário oculto exclusivo no mesmo diretório do arquivo final.
-Copiar com buffer de 1 MiB, calculando SHA-256 da origem; sincronizar a escrita e reler o temporário
-inteiro para comparar tamanho e SHA-256. Revalidar origem e caminhos antes de publicar o arquivo com
-`renameatx_np(RENAME_EXCL)`, que recusa substituir um nome existente. Não há fallback para renomeação
-que possa sobrescrever. Se o filesystem não suportar essa finalização, a operação falha explicitamente.
-A sincronização do diretório é exigida antes de registrar o arquivo como copiado.
+Directories and files are accessed through descriptors with `O_NOFOLLOW`; source files are opened read-only.
+An exclusive hidden temporary file is created in the final destination directory. Copying uses a 1 MiB buffer
+and calculates the source SHA-256 checksum; writes are synchronized and the entire temporary file is read
+again to compare size and SHA-256. Source and paths are revalidated before publishing the file with
+`renameatx_np(RENAME_EXCL)`, which refuses to replace an existing name. There is no fallback to a rename
+that could overwrite a file. If the filesystem does not support this finalization, the operation fails explicitly.
+Directory synchronization is required before recording a file as copied.
 
-Arquivos existentes são abertos sem seguir links. Comparar tamanho e SHA-256 completo da origem e
-do destino, conferindo que permaneceram inalterados durante a leitura. Conteúdo igual é registrado
-como **Já presente — conteúdo verificado**; conteúdo diferente é conflito, sem alteração do existente.
-Falhas por arquivo permitem representar pares parcialmente importados. Falhas graves de I/O, espaço
-ou registro interrompem a operação; o resumo diferencia falhas, cancelados e arquivos não iniciados.
+Existing files are opened without following links. Roll compares source and destination sizes and full
+SHA-256 checksums, checking that the files remained unchanged while being read. Matching content is recorded
+as **Already Imported — content verified**; different content is a conflict, and the existing file remains
+unchanged. Per-file failures allow partially imported pairs to be represented accurately. Serious I/O,
+space or recording failures stop the operation; the summary distinguishes failed, cancelled and unstarted files.
 
-**Verificar e tentar novamente** repete a operação sobre a prévia, revalidando os arquivos existentes.
-Depois de mudar origem, seleção ou organização, gere outra prévia. Arquivos finais íntegros não são
-recopiados quando seu conteúdo corresponde à origem. RAW é copiado como bytes: não é necessário que
-seu preview seja suportado. Datas EXIF são preservadas; datas, permissões e atributos adicionais do
-filesystem da origem não são replicados para o destino.
+**Verify and Retry** repeats the operation using the preview, revalidating existing files.
+After changing the source, selection or organization, generate a new preview. Intact final files are not
+copied again when their content matches the source. RAW files are copied as bytes: preview support is not
+required. EXIF dates are preserved; source filesystem timestamps, permissions and additional attributes
+are not replicated to the destination.
 
-### Registros de importação
+### Import records
 
-Os registros ficam no Application Support do container do aplicativo, em `PhotoImporter/Imports`,
-um JSON versionado por operação. São gravados atomicamente e sincronizados antes de escrever na
-biblioteca, após validar o temporário e após publicar cada arquivo. Cada registro contém caminhos,
-tamanhos, nomes dos temporários, SHA-256 quando disponível, estados e erros. O identificador aparece
-no resumo da operação. Não existe catálogo proprietário na biblioteca. Registros novos usam versão 2,
-incluindo estado da origem, identidade do temporário e vínculo com a operação retomada. A leitura aceita
-versões 1 e 2, sem reescrever silenciosamente registros antigos. Arquivos `.lock` locais protegem operações
-ativas entre janelas/instâncias; as travas são liberadas pelo sistema quando o processo termina.
+Records are stored in the application container's Application Support directory under `PhotoImporter/Imports`,
+with one versioned JSON file per operation. They are written atomically and synchronized before writing
+to the archive, after verifying the temporary file and after publishing each file. Each record contains
+paths, sizes, temporary filenames, SHA-256 checksums when available, states and errors. The operation ID
+appears in its summary. There is no proprietary catalog in the archive. New records use version 2,
+including source state, temporary-file identity and a link to the operation being resumed. Reading supports
+versions 1 and 2 without silently rewriting older records. Local `.lock` files protect active operations
+across windows and instances; the operating system releases locks when the process terminates.
 
-Uma falha de registro antes da cópia impede a operação. Uma falha depois da publicação pode deixar
-um arquivo final íntegro com estado ainda pendente/erro: a nova tentativa confere o conteúdo real,
-sem confiar somente no registro.
+A recording failure before copying prevents the operation. A failure after publication can leave an intact
+final file with a pending/error state: retry checks actual content instead of relying on the record alone.
 
-No cancelamento e nas falhas tratadas, tentar remover apenas o temporário criado pela própria operação.
-Encerramento abrupto ou desconexão podem deixar temporários ocultos `.photoimporter-<operação>-<índice>.partial`,
-identificados no registro, sem apresentá-los como arquivos finais completos. O histórico identifica
-operações novas interrompidas quando o registro está em andamento e a trava não está mais ativa.
-Não houve teste de perda física de energia. A sincronização não equivale a garantia absoluta de
-durabilidade do dispositivo nem a backup independente. Os originais nunca são removidos do cartão.
+On cancellation or handled failures, Roll attempts to remove only the temporary file created by that operation.
+Abrupt termination or disconnection can leave hidden `.photoimporter-<operation>-<index>.partial` files,
+identified in the record without presenting them as complete final files. History identifies interrupted
+new operations when the record is still running but its lock is no longer active.
+Physical power loss has not been tested. Synchronization is not an absolute guarantee of device durability
+and does not constitute an independent backup. Originals are never removed from the card.
 
-## Histórico, conferência e retomada
+## History, verification and recovery
 
-Abra **Histórico** no cabeçalho. Cada operação mostra data, origem, destino, contagem de fotografias/
-arquivos e resultado individual de RAW/JPEG. Registros corrompidos ou de versão desconhecida são
-reportados sem ocultar os demais nem alterar seus arquivos JSON.
+Open **History** in the sidebar. Each operation shows its date, source, destination, photo/file counts,
+and individual RAW/JPEG results. Corrupt records or records with unknown versions are reported without
+hiding other records or modifying their JSON files.
 
-Selecione uma operação e use **Confirmar biblioteca…** para conceder acesso à pasta atual. UUID do
-volume e identidade da pasta são conferidos; outra unidade/pasta não é aceita só por ter o mesmo nome.
-Quando há UUID estável, uma mudança de identificador do dispositivo após remontagem não impede o
-reconhecimento da mesma pasta/inode. Sem identidade suficiente, ações de escrita são bloqueadas.
+Select an operation and use **Confirm Archive…** to grant access to the current folder. The volume UUID
+and folder identity are checked; another drive or folder is not accepted merely because it has the same name.
+When a stable UUID is available, a device identifier change after remounting does not prevent recognition
+of the same folder/inode. Without sufficient identity information, write actions are blocked.
 
-**Conferir destino** apenas lê os arquivos, sem exigir o cartão conectado. A coluna **Resultado
-registrado** preserva o que aconteceu na operação; **Destino agora** mostra conteúdo íntegro, ausente,
-diferente, sem checksum de referência ou indisponível. Uma cópia pode ser confirmada mesmo quando
-o processo terminou após publicá-la e antes de registrar sucesso. O horário de conferência é exibido;
-atualize após mudanças externas. O aplicativo não transforma presença em comprovação sem SHA-256.
+**Verify Destination** only reads files and does not require the card to be connected. The **Recorded result**
+column preserves what happened during the operation; **Destination now** shows content as intact, missing,
+different, without a reference checksum, or unavailable. A copy can be confirmed even if the process ended
+after publication but before recording success. The verification time is displayed; refresh after external
+changes. File presence alone is not treated as proof without SHA-256 verification.
 
-Para retomar:
+To resume an import:
 
-1. Confirmar a origem e a biblioteca usando os seletores nativos.
-2. Clicar em **Preparar retomada**. Os caminhos originais de destino são preservados e arquivos
-   já íntegros são excluídos da nova cópia. A origem dos demais é conferida contra o estado/checksum
-   registrado. Origem alterada, conflito de conteúdo e falta de espaço aparecem como pendências.
-3. Clicar em **Abrir prévia da retomada**, revisar os arquivos e então **Importar**.
+1. Confirm the source and archive through the native pickers.
+2. Click **Prepare Recovery**. Original destination paths are preserved, and intact files are excluded
+   from the new copy. The remaining source files are checked against recorded state/checksums.
+   Changed sources, content conflicts and insufficient space are flagged as issues.
+3. Click **Open Recovery Preview**, review the files, then click **Import Roll**.
 
-A retomada gera uma nova operação vinculada à anterior. O resultado original não é sobrescrito.
-O histórico oferece navegação entre as tentativas e pode usar checksums de retomadas vinculadas
-quando identidades, origem e destinos correspondem, sempre relendo o destino atual. Cadeias cíclicas
-ou excessivamente profundas são tratadas conservadoramente, sem inferir conteúdo.
+Recovery creates a new operation linked to the previous one. The original result is not overwritten.
+History provides navigation between attempts and can use checksums from linked recovery operations
+when identities, sources and destinations match, always rereading the current destination. Cyclic or
+excessively deep chains are handled conservatively without inferring content.
 
-Registros antigos sem estado/checksum da origem não autorizam retomada automática de arquivos pendentes:
-faça uma nova descoberta. Registros versão 1 em andamento, sem trava, têm atividade desconhecida;
-suas ações de recuperação/limpeza são bloqueadas, pois podem pertencer a uma instância antiga ainda ativa.
-Não há cópia automática ao iniciar o aplicativo ou abrir o histórico.
+Older records without source state/checksums do not authorize automatic recovery of pending files:
+scan the source again. Running version 1 records without a lock have unknown activity;
+recovery and cleanup are blocked because they may belong to an older instance that is still active.
+No copying starts automatically when the app launches or history opens.
 
-### Temporários registrados
+### Recorded temporary files
 
-Com a biblioteca confirmada, clicar em **Verificar temporários**. A lista mostra somente os nomes
-exatos previstos pelo registro. **Remover temporários verificados…** pede confirmação da limpeza e
-revalida as identidades antes de remover. Somente arquivos regulares com identidade registrada,
-tamanho compatível, mesma data de criação registrada e sem outros hard links são elegíveis. Se a data
-de criação não estiver disponível, o temporário é preservado. Isso evita confiar apenas em um inode
-que possa ter sido reutilizado pelo filesystem. Links simbólicos, nomes estranhos, arquivos
-substituídos após a inspeção e temporários antigos sem identidade permanecem intactos. Arquivos finais
-e originais não são alvos da limpeza. Operações ativas ficam protegidas pela trava.
+With the archive confirmed, click **Inspect Temporary Files**. The list shows only the exact names expected
+by the record. **Remove Verified Temporary Files** requests confirmation and revalidates identities before
+removing anything. Only regular files with recorded identity, compatible size, the same recorded creation
+time and no additional hard links are eligible. If the creation time is unavailable, the temporary file is
+preserved. This avoids relying solely on an inode that the filesystem might have reused. Symbolic links,
+unexpected names, files replaced after inspection and older temporary files without recorded identities
+remain untouched. Final files and originals are never cleanup targets. Active operations are protected by locks.
 
-Se a inspeção/limpeza for cancelada ou uma unidade ficar indisponível, conferir novamente o destino.
-A biblioteca padrão possui acesso persistente. As confirmações de origem e biblioteca no histórico
-continuam explícitas, por operação, antes de ações de recuperação ou limpeza.
+If inspection or cleanup is cancelled, or a drive becomes unavailable, verify the destination again.
+The default archive has persistent access. Source and archive confirmation in history remains explicit
+and per operation before recovery or cleanup actions.
 
-## Interface e navegação
+## Interface and navigation
 
-A janela usa barra lateral com **New Roll / Novo rolo**, **History / Histórico** e **Settings / Ajustes**, inspirada nos mockups
-fornecidos. A tela Importar apresenta origem e destino em cartões, formato/organização e evento,
-grade de seleção com filtros e resumo fixo de fotografias, arquivos e tamanho. O conteúdo é rolável;
-a grade continua com carregamento preguiçoso de miniaturas. **Review Roll / Revisar rolo** abre a prévia existente:
-a cópia exige confirmar **Importar** nessa prévia. Erros e cancelamento da prévia ficam junto da ação principal.
+The window uses a sidebar with **New Roll**, **History** and **Settings**, inspired by the supplied mockups.
+New Roll displays source and destination cards, format/organization and event controls, a photo selection
+grid with filters, and a fixed summary of photos, files and size. Content scrolls, and thumbnails continue
+to load lazily. **Review Roll** opens the existing preview; copying requires confirmation through
+**Import Roll** in that preview. Preview errors and cancellation are located alongside the primary action.
 
-Histórico apresenta cartões com data, sessão extraída do caminho registrado, contagens, origem,
-destino e estado real. Há filtros de período e estado. Ao abrir um cartão, os detalhes preservam
-conferência de conteúdo, confirmação de pastas, retomadas vinculadas e limpeza confirmada de temporários.
-Os cartões usam ícones: não há leitura automática de fotos sem autorização para ilustrar registros.
-A transição da retomada fecha os detalhes antes de abrir a prévia na tela Importar.
+History displays cards with the date, session extracted from the recorded path, counts, source,
+destination and actual state. Period and status filters are available. Opening a card preserves access
+to content verification, folder confirmation, linked recovery attempts and confirmed temporary-file cleanup.
+Cards use icons: photos are not automatically read without authorization to illustrate records.
+The recovery transition closes the details before opening the preview in New Roll.
 
-Preferências usa seções de biblioteca, organização, formato, arquivos já importados e segurança.
-A data permanece obrigatória, o evento é definido por importação, não existe opção de sobrescrita e
-SHA-256 continua obrigatório. Os números de capacidade vêm do volume escolhido, sem valores fixos
-dos mockups; o rodapé identifica que a consulta foi feita na conexão. A cópia revalida espaço e acesso.
-A marca usa wordmark `roll.`, destaque âmbar e fundos semânticos nativos. Sobre Roll e Ajustes
-estão disponíveis no menu do aplicativo. A janela inicia em 1280 × 880 e permite redimensionar a partir de 1040 × 740.
+Settings contains sections for the archive, organization, format, already imported files and safety.
+The date folder remains mandatory, the event is set per import, overwriting is unavailable and SHA-256
+verification remains mandatory. Capacity figures come from the selected volume rather than fixed mockup
+values; the footer identifies that capacity was checked at connection. Copying revalidates space and access.
+Branding uses the `roll.` wordmark, amber accents and native semantic backgrounds. About Roll and Settings
+are available from the application menu. The window starts at 1280 × 880 and can be resized down to 1040 × 740.
 
-O usuário informou ter validado o fluxo manual anterior com cartão, SSD e RW2 reais, incluindo
-reabertura/reconexão e uma sessão grande. Essa confirmação se refere ao fluxo antes da reorganização
-visual; a navegação e os controles novos precisam ser conferidos no aplicativo atualizado.
+The user reported validating the previous manual workflow with a real card, SSD and RW2 files, including
+reopening/reconnection and a large session. This confirmation applies to the workflow before the visual
+reorganization; the new navigation and controls still need verification in the updated app.
 
-## Preferências e volumes
+## Settings and volumes
 
-Abra **Preferências…** (⌘,) para escolher a biblioteca padrão, formato inicial (ambos/RAW/JPEG),
-filtro inicial de não importadas e presença das pastas de ano e de formato. A pasta de data e evento
-opcional e os nomes originais são sempre preservados. Os padrões iniciais mantêm o layout anterior.
-Formato e filtro valem para novas descobertas; **Aplicar padrões aos filtros atuais** atualiza a sessão.
-Organização vale para novas prévias; mudanças exigem recalcular a prévia. Retomadas mantêm os caminhos registrados.
-Arquivos existentes continuam sujeitos à comparação de conteúdo, sem opção de sobrescrita silenciosa.
+Open **Settings…** (⌘,) to choose the default archive, initial format (RAW + JPEG/RAW/JPEG),
+initial not-yet-imported filter, and whether year and format folders are included. The date folder,
+optional event and original filenames are always preserved. Initial defaults retain the previous layout.
+Format and filter defaults apply to new scans; **Apply Defaults to Current Filters** updates the current session.
+Organization applies to new previews; changes require recalculating the preview. Recovery preserves recorded paths.
+Existing files remain subject to content comparison, without an option to silently overwrite them.
 
-Preferências usam UserDefaults no container local do aplicativo. A biblioteca é lembrada por um
-security-scoped bookmark, com entitlement de bookmark no escopo do app. Ao abrir ou reconectar,
-resolver sem montar unidades ou mostrar diálogos automáticos; conferir UUID do volume, inode e data
-de criação da pasta (quando disponíveis). Sem UUID, exigir também o mesmo dispositivo.
-Um caminho salvo serve apenas para exibição, nunca para conceder acesso ou escolher outra pasta.
-Bookmarks desatualizados são renovados somente após validar a identidade. Se estiverem inválidos,
-sem permissão ou se a identidade divergir, escolher a pasta novamente. Mudanças de nome/localização
-podem exigir essa confirmação se o resolvedor nativo não encontrar a pasta original.
-**Esquecer pasta** remove somente a preferência; nenhum arquivo da biblioteca é apagado.
+Settings use UserDefaults in the local application container. The archive is remembered through a
+security-scoped bookmark with an app-scoped bookmark entitlement. At launch or reconnection, the bookmark
+is resolved without mounting drives or showing automatic dialogs; the volume UUID, folder inode and creation
+time are checked when available. Without a UUID, the device must also match.
+A saved path is for display only and is never used to grant access or select another folder.
+Stale bookmarks are renewed only after identity validation. If a bookmark is invalid, permission is missing,
+or identity differs, choose the folder again. Renaming or moving a folder may require confirmation if the
+native resolver cannot find the original folder. **Forget Folder** removes only the preference;
+no archive files are deleted.
 
-O menu **Volumes** lista unidades externas/removíveis/ejetáveis visíveis ao sandbox. Escolher uma
-abre o seletor nativo nessa unidade para autorizar a origem. A seleção manual continua disponível.
-NSWorkspace monitora montagem, desmontagem e renomeação: a biblioteca tenta reconectar e a descoberta/
-prévia anterior é descartada, exigindo nova escolha da origem. Nenhum evento inicia uma cópia.
-Durante uma importação, o motor mantém seu próprio acesso e suas verificações; a atualização de acesso
-é adiada até terminar, preservando o resumo. Retirada física continua sujeita à validação manual.
-Acesso de leitura/escrita e disponibilidade são mostrados na biblioteca; capacidade e espaço necessário
-são conferidos na prévia e novamente durante a cópia. Não há arquivo de teste de escrita na reconexão.
+The source selection menu lists external/removable/ejectable volumes visible to the sandbox. Choosing one
+opens the native picker at that volume to authorize the source. Manual folder selection remains available.
+NSWorkspace monitors mounting, unmounting and renaming: the archive attempts to reconnect, and the previous
+scan/preview is discarded, requiring source selection again. No event starts a copy.
+During an import, the engine retains its own access and verification; access refresh is deferred until
+completion, preserving the summary. Physical removal remains subject to manual validation.
+Read/write access and availability are shown for the archive; capacity and required space are checked
+in the preview and again during copying. Reconnection does not create a write-test file.
 
-## Requisitos e execução
+## Requirements and running
 
-macOS 27+, Xcode 27+ e Swift 6. Sem dependências externas, conta Apple ou provisioning profile.
-O projeto usa assinatura local ad hoc e App Sandbox com acesso de leitura/escrita às pastas escolhidas,
-necessário para o destino. O código de origem continua usando somente leitura e não cria, altera,
-move ou remove arquivos do cartão. A gravação dos registros locais é rejeitada se sua pasta se
-sobrepuser à origem ou à biblioteca.
-O `PrivacyInfo.xcprivacy` declara as consultas locais de capacidade e metadados de arquivos,
-conforme as [categorias e motivos documentados pela Apple](https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype).
+macOS 27+, Xcode 27+ and Swift 6. No external dependencies, Apple account or provisioning profile required.
+The project uses local ad hoc signing and App Sandbox with read/write access to selected folders,
+as required for the destination. Source access remains read-only and never creates, modifies, moves
+or removes files on the card. Writing local records is rejected if their directory overlaps the source
+or archive.
+`PrivacyInfo.xcprivacy` declares local capacity and file metadata access according to the
+[categories and reasons documented by Apple](https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype).
 
-Abra `PhotoImporter.xcodeproj`, selecione o scheme compartilhado **PhotoImporter** e execute no Mac.
-Alternativamente, na raiz do repositório:
+Open `PhotoImporter.xcodeproj`, select the shared **PhotoImporter** scheme and run on your Mac.
+Alternatively, from the repository root:
 
 ```sh
 xcodebuild -project PhotoImporter.xcodeproj \
@@ -313,116 +310,118 @@ xcodebuild -project PhotoImporter.xcodeproj \
 open /tmp/PhotoImporterDerivedData/Build/Products/Debug/Roll.app
 ```
 
-O build normal após os testes restaura os entitlements normais: o Xcode acrescenta exceções
-temporárias de acesso ao hospedar testes no aplicativo. Essas exceções não fazem parte do arquivo
-de entitlements do projeto.
+A normal build after tests restores the normal entitlements: Xcode adds temporary access exceptions
+when hosting tests in the app. Those exceptions are not part of the project's entitlements file.
 
-## Instalador local (DMG)
+## Local installer (DMG)
 
-Para gerar uma versão Release para este Mac:
+To generate a Release build for this Mac:
 
 ```sh
 ./scripts/package-local.sh
 ```
 
-O projeto/target/scheme e módulo continuam `PhotoImporter`; o produto/executável são `Roll`.
-O Bundle Identifier e `PhotoImporter/Imports` permanecem inalterados, sem migração de dados.
-Não use simultaneamente a cópia antiga `PhotoImporter.app` e `Roll.app`, que compartilham a mesma identidade.
+The project, target, scheme and module remain `PhotoImporter`; the product and executable are `Roll`.
+The bundle identifier and `PhotoImporter/Imports` are unchanged, without data migration.
+Do not run the old `PhotoImporter.app` and `Roll.app` simultaneously: they share the same identity.
 
-O script compila para Apple Silicon (`arm64`), verifica a assinatura ad hoc e cria
-`build/releases/Roll-0.1.1-macOS-arm64.dmg`, acompanhado do SHA-256 e do log de build.
-O diretório `build/` já é ignorado. Uma imagem existente não é sobrescrita: preserve ou renomeie
-o DMG anterior antes de repetir o empacotamento. Não exige conta Apple nem envia arquivos à Apple.
+The script builds for Apple Silicon (`arm64`), verifies the ad hoc signature and creates
+`build/releases/Roll-0.1.1-macOS-arm64.dmg`, alongside its SHA-256 checksum and build log.
+The `build/` directory is already ignored. Existing images are not overwritten: preserve or rename
+the previous DMG before packaging again. No Apple account is required and no files are sent to Apple.
 
-Sem importações em andamento, encerre o app aberto. Abra o DMG, arraste `Roll.app`
-para **Applications (Aplicativos)**, ejete a imagem e abra o aplicativo instalado.
-Requer macOS 27+ e Apple Silicon. A biblioteca pode precisar ser autorizada novamente.
+With no imports running, quit the open app. Open the DMG, drag `Roll.app` into **Applications**,
+eject the image and open the installed app. Requires macOS 27+ and Apple Silicon.
+The archive folder may need to be authorized again.
 
-Essa imagem serve para instalação local. A assinatura ad hoc não equivale a Developer ID ou
-notarização; distribuir para outras pessoas pode gerar bloqueios do Gatekeeper. Uma distribuição
-notarizada exige credenciais e certificado próprios do Apple Developer Program e um processo
-separado de assinatura/notarização. O script não altera as configurações de segurança do Mac.
+This image is for local installation. An ad hoc signature is not Developer ID signing or notarization;
+distributing it to others may trigger Gatekeeper blocking. Notarized distribution requires your own
+Apple Developer Program credentials and certificate, plus a separate signing/notarization process.
+The script does not change the Mac's security settings.
 
-## Validação
+## Validation
 
-Os 94 testes criam e removem apenas suas próprias pastas temporárias. Não requerem cartão ou SSD.
-Cobrem recursão, formatos, pares e nomes repetidos entre diretórios, JPG+JPEG simultâneos,
-distinção de caixa nos nomes-base, arquivos ocultos e links, pastas vazias e origens inválidas,
-erros de permissão, cancelamento, troca de origem e 360 pares/720 arquivos.
-JPEGs gerados com EXIF controlado validam leitura de datas, prioridade e fallback, offsets sem
-deslocamento do dia, orientação, decodificação e tamanho de miniatura. Também são testados
-limites inclusivos de datas, filtros combinados, seleção, contagens/tamanhos por formato,
-remoção de seleções ocultadas e reset ao trocar de origem.
-Conteúdo, criação e modificação dos arquivos de origem são comparados antes/depois da leitura.
-Arquivos RW2 fictícios validam reconhecimento por extensão e agrupamento, não o formato RAW.
-Os testes de planejamento usam diretórios reais simulando SD e biblioteca. Cobrem organização com/sem
-evento, vários dias, formatos, arquivos existentes, colisões de nomes e Unicode, sobreposição,
-links quebrados/escapando do destino, falta de acesso, destino ausente, origem removida/alterada,
-cancelamento e invalidação da prévia. Capacidade insuficiente/desconhecida, regras de caixa e volume
-somente leitura são simulados por uma consulta de volume injetável; os demais acessos são reais.
-Snapshots de conteúdo e datas de arquivos/pastas confirmam que a prévia não altera origem nem biblioteca.
-Os testes de importação fazem cópias reais entre diretórios, conferindo bytes e SHA-256, arquivos de
-origem somente leitura, registro JSON e nova tentativa sem recópia. Cobrem conflito de mesmo tamanho,
-par parcial, corrupção do temporário, cancelamento durante cópia e antes da publicação, arquivo
-concorrente no instante do rename, alteração da origem, troca de pasta por symlink, biblioteca
-substituída, UUID de volume divergente, espaço insuficiente, falha de escrita e falha do registro.
-Os checkpoints simulam falhas sobre arquivos reais; ENOSPC/desconexão não foram provocados em hardware.
-Um erro simulado após publicação confirma que a nova tentativa verifica o arquivo final íntegro.
-Os testes de histórico constroem interrupções com registros em andamento e temporários parciais em disco.
-Cobrem versões antigas, JSON corrompido, trava ativa, destino ausente/alterado, retomadas parciais e em várias
-tentativas, origem alterada, pastas erradas, paths adulterados, cancelamento da limpeza e preservação de
-temporários desconhecidos, substituídos, simbólicos, ligados por hard link ou com identificador reutilizado.
-O filtro é validado por arquivo,
-incluindo contagens e data de par parcial, homônimos com conteúdos distintos e reimportação após perda do destino.
-Os testes de preferências usam domínios isolados de UserDefaults. Cobrem persistência, valores inválidos,
-padrões na descoberta, bookmarks nativos entre instâncias de acesso, pasta ausente, identidade divergente,
-pasta substituída no caminho antigo, links, notificação de montagem e descarte da prévia/seleção.
-As quatro combinações de organização e colisões são verificadas; uma cópia real confirma o layout
-alternativo e a preservação do original. Mudança de organização exige nova prévia antes de copiar.
-Não foi feito encerramento forçado de processo nem teste físico de desconexão/perda de energia.
+The 94 tests create and remove only their own temporary directories. They do not require a card or SSD.
+Coverage includes recursion, formats, pairs and repeated names across directories, simultaneous JPG+JPEG,
+case-sensitive filename stems, hidden files and links, empty folders and invalid sources,
+permission errors, cancellation, source switching, and 360 pairs/720 files.
+Generated JPEGs with controlled EXIF validate date reading, priority and fallback, offsets without day
+shifts, orientation, decoding and thumbnail size. Tests also cover inclusive date limits, combined filters,
+selection, format-specific counts/sizes, removal of hidden selections and reset on source changes.
+Source file content, creation and modification timestamps are compared before and after reading.
+Fake RW2 files validate extension recognition and grouping, not the RAW format itself.
 
-Verificação manual no aplicativo:
+Planning tests use real directories simulating an SD card and archive. They cover organization with/without
+an event, multiple days, formats, existing files, filename and Unicode collisions, overlap,
+broken links/links escaping the destination, missing access, missing destinations, removed/changed sources,
+cancellation and preview invalidation. Insufficient/unknown capacity, case rules and read-only volumes
+are simulated through an injectable volume reader; other filesystem access is real.
+Content and timestamp snapshots of files/folders confirm that preview changes neither source nor archive.
 
-1. Escolher uma pasta com arquivos JPG/RW2, inclusive em subpastas DCIM.
-2. Conferir agrupamento, miniaturas, datas, indicadores e contagem de fotografias versus arquivos.
-3. Selecionar pares, alternar Todos/JPEG/RAW e conferir arquivos e tamanho elegíveis.
-4. Ativar o intervalo de datas, conferir seus limites e as seleções removidas ao estreitar o filtro.
-5. Escolher outra origem, cancelar uma varredura e testar uma pasta vazia.
-6. Selecionar um cartão real e conferir leitura sob sandbox sem alterar os originais.
-7. Usar RW2 reais da G100D, isolados e em pares, e conferir EXIF e preview RAW.
-8. Escolher a biblioteca, informar um evento e gerar a prévia. Conferir caminhos, volume, espaço e contagens.
-9. Fechar a prévia, mudar seleção/formato/evento e gerar outra; conferir atualização dos destinos e arquivos.
-10. Testar uma biblioteca com arquivos existentes e conferir que eles aparecem como pendentes de verificação,
-    sem sobrescrita ou criação de pastas/arquivos.
-11. Usar primeiro diretórios de teste, clicar em Importar e conferir destinos, SHA-256 e resumo no Finder.
-12. Repetir a importação e conferir o estado de conteúdo já presente, sem recópia.
-13. Cancelar uma seleção maior e conferir que nenhum arquivo final ficou incompleto; gerar nova tentativa.
-14. Abrir Histórico, confirmar a biblioteca e conferir **Resultado registrado** versus **Destino agora**.
-15. Em diretórios de teste, remover/alterar uma cópia e repetir a conferência; o original deve permanecer intacto.
-16. Preparar a retomada de uma operação incompleta, confirmar as duas pastas e revisar a prévia antes de importar.
-17. Inspecionar os temporários registrados, conferir os caminhos da lista e confirmar somente a limpeza elegível.
-18. Ativar **Não importadas nesta biblioteca**, testar um par parcialmente importado e conferir os arquivos elegíveis.
-19. Alterar preferências, reabrir o app e conferir formato, filtro, organização e biblioteca lembrados sob sandbox normal.
-20. Com unidades de teste, retirar/reconectar o SSD e verificar estado e restauração da biblioteca; escolher a origem novamente.
-21. Conectar outra unidade com o mesmo nome: ela não pode substituir a biblioteca original automaticamente.
-22. Conferir o menu Volumes e o seletor manual com cartão e SSD reais; testar perda de permissão e nova autorização.
+Import tests copy real files between directories, checking bytes and SHA-256, read-only source files,
+JSON records and retry without recopying. They cover same-size content conflicts, partial pairs,
+temporary-file corruption, cancellation during copying and before publication, a concurrent file appearing
+at rename time, source changes, folder replacement by symlink, archive replacement, mismatched volume UUIDs,
+insufficient space, write failures and recording failures. Checkpoints simulate failures over real files;
+ENOSPC/disconnection has not been triggered on hardware. A simulated post-publication error confirms
+that retry verifies an intact final file.
 
-Os testes de branding conferem o produto Roll com Bundle Identifier/caminho de histórico preservados,
-leitura dos valores antigos de formato e catálogos inglês/pt-BR com placeholders correspondentes.
-Os testes tradicionais rodam em pt-BR para preservar asserções de mensagens; a localização testa os dois idiomas.
-O build e os testes automatizados foram executados localmente. O usuário confirmou o fluxo manual
-anterior com cartão e SSD reais. As três telas novas foram renderizadas nativamente com diretórios
-simulados em 1280 × 880 e 1040 × 740, incluindo uma importação real de seis JPEGs de teste.
-Essas renderizações verificam layout, sem substituir a interação manual: a automação de interface
-não tem permissão de Acessibilidade neste ambiente. Conferir navegação, seletores, filtros e retomada
-na interface reorganizada.
+History tests construct interruptions using running records and partial temporary files on disk.
+They cover older versions, corrupt JSON, active locks, missing/changed destinations, partial and repeated
+recovery attempts, changed sources, wrong folders, tampered paths, cleanup cancellation, and preservation
+of unknown, replaced, symbolic, hard-linked temporary files or files with reused identifiers.
+Filtering is verified per file, including counts and dates for partial pairs, same-name files with different
+content, and reimporting after destination loss.
 
-## Limitações e próximo passo
+Settings tests use isolated UserDefaults domains. They cover persistence, invalid values, discovery defaults,
+native bookmarks across access-service instances, missing folders, mismatched identity, replacement folders
+at old paths, links, mount notifications and preview/selection invalidation.
+All four organization combinations and collisions are checked; a real copy confirms the alternate layout
+and preservation of originals. Organization changes require a new preview before copying.
+No process was forcibly terminated, and physical disconnection/power loss has not been tested.
 
-O usuário confirmou a validação manual de RW2 reais, reabertura/reconexão e sessão grande no fluxo anterior.
-Retirada física durante cópia e perda de energia não foram validadas.
-Bookmarks foram testados com diretórios temporários e múltiplas instâncias do serviço de acesso.
-Permissões revogadas e o fluxo visual reorganizado ainda precisam de teste manual.
+Manual verification in the app:
 
-O próximo passo é conferir a nova navegação, a seleção/rolagem, os filtros do histórico e a abertura
-de detalhes e retomada no app; depois preparar uma versão Release local para uso cotidiano.
+1. Choose a folder with JPG/RW2 files, including DCIM subfolders.
+2. Check grouping, thumbnails, dates, indicators, and photo versus file counts.
+3. Select pairs, switch between RAW + JPEG/JPEG/RAW, and check eligible files and size.
+4. Enable date filtering, check endpoints and selection removal when narrowing the filter.
+5. Choose another source, cancel a scan and test an empty folder.
+6. Select a real card and verify sandboxed reading without changing originals.
+7. Use real G100D RW2 files, standalone and paired, and check EXIF and RAW previews.
+8. Choose the archive, enter an event and generate the preview. Check paths, volume, space and counts.
+9. Close the preview, change selection/format/event and regenerate it; check updated destinations and files.
+10. Test an archive containing existing files and confirm they require verification,
+    without overwriting or creating folders/files during preview.
+11. Start with test directories, click Import Roll and check destinations, SHA-256 and the Finder summary.
+12. Repeat the import and check that matching content is identified without being copied again.
+13. Cancel a larger selection and confirm no final file is incomplete; prepare another attempt.
+14. Open History, confirm the archive and compare **Recorded result** with **Destination now**.
+15. In test directories, remove/change a copy and verify again; the original must remain intact.
+16. Prepare recovery for an incomplete operation, confirm both folders and review the preview before importing.
+17. Inspect recorded temporary files, review the listed paths and confirm only eligible cleanup.
+18. Enable **Not yet imported into this archive**, test a partially imported pair and check eligible files.
+19. Change settings, reopen the app and check that format, filter, organization and archive persist under normal sandboxing.
+20. With test drives, disconnect/reconnect the SSD and verify archive status and restoration; select the source again.
+21. Connect another drive with the same name: it must not automatically replace the original archive.
+22. Check detected volumes and manual selection with a real card and SSD; test revoked permission and reauthorization.
+
+Branding tests verify the Roll product while preserving the bundle identifier/history path,
+reading older format values, and matching English/pt-BR catalog placeholders.
+Traditional tests run in pt-BR to preserve message assertions; localization tests cover both languages.
+Builds and automated tests have been run locally. The user confirmed the previous manual workflow
+with a real card and SSD. The three new screens were rendered natively using simulated directories
+at 1280 × 880 and 1040 × 740, including a real import of six test JPEGs.
+These renderings check layout without replacing manual interaction: UI automation does not have
+Accessibility permission in this environment. Check navigation, pickers, filters and recovery in the
+reorganized interface.
+
+## Limitations and next step
+
+The user confirmed manual validation of real RW2 files, reopening/reconnection and a large session
+in the previous workflow. Physical removal during copying and power loss have not been validated.
+Bookmarks have been tested using temporary directories and multiple access-service instances.
+Revoked permissions and the reorganized visual workflow still need manual testing.
+
+The next step is to check the new navigation, selection/scrolling, history filters, and opening details
+and recovery in the app, then prepare a local Release build for everyday use.
