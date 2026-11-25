@@ -18,7 +18,7 @@ No Git tag or GitHub release has been created.
 - Content-based existing-file checks, local operation records, reconciliation and recovery previews.
 - Identity-checked temporary cleanup, scoped archive bookmarks and volume notifications.
 - English and Brazilian Portuguese localization, light and dark appearances.
-- Import safety tests, local DMG packaging, contributor documentation and a proposed CI workflow.
+- Import safety tests, local DMG packaging, contributor documentation and a CI workflow with a verified passing remote run.
 
 ### Asset and compatibility review
 
@@ -32,4 +32,4 @@ No Git tag or GitHub release has been created.
 
 ### Known publication gate
 
-- Obtain separate approval for the reviewed exact-lease private push, pass remote CI, and complete maintainer review before public visibility.
+- Complete final maintainer review and explicitly approve public visibility. The authorized exact-lease private push and first remote CI have passed.

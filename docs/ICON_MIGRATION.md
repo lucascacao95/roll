@@ -1,6 +1,6 @@
 # App icon replacement and history cleanup plan
 
-Status: **local historical rewrite authorized and completed; no push authorized or executed**.
+Status: **authorized local cleanup and exact-lease private push completed; first remote CI passed**.
 
 ## Execution result
 
@@ -25,10 +25,11 @@ Pinned tool source: newren/git-filter-repo at d7b75aca907380f608892cc289e616f195
 No global tool installation or Git configuration change was made. Tool/check details and verification
 maps are in ignored build/IconAudit and the separate private backup. Backup paths are not public documentation.
 
-Remote main remains b9be783 and PRIVATE. It still needs an explicitly authorized exact-lease update, then
-real remote CI and final maintainer review. Do not fetch/merge the old remote history into this sanitized
-repository before that update; doing so would make the old blobs reachable again. The stale local
-origin/main tracking ref is intentionally omitted; the origin URL is retained. No force push has occurred.
+On 2026-11-25, the maintainer separately authorized the private push and CI. The command
+`git push --force-with-lease=refs/heads/main:b9be783d46f7dbae0101a83e10b26a7e69077541 origin refs/heads/main:refs/heads/main`
+succeeded, updating main to dfe07cd. The [first CI run](https://github.com/lucascacao95/roll/actions/runs/45623132133) passed. No public visibility,
+release, tag or binary publication was authorized or performed. Normal local fetch and origin/main tracking
+were restored only after that successful push; no old blob is reachable from the restored tracking ref.
 
 The inventory and plan below record the pre-cleanup state and approved strategy, not a claim that old
 pixels still exist in the local publication history. Historical provisional filenames/text remain, but
@@ -175,13 +176,11 @@ A future force-with-lease command must use the freshly verified old remote SHA. 
 git push --force-with-lease=refs/heads/main:<approved-old-remote-sha> origin refs/heads/main:refs/heads/main
 ```
 
-The narrow local rewrite above is complete. The future push command remains unexecuted and requires separate approval.
+The narrow local rewrite and its separately authorized exact-lease push are complete. The command above records the approved strategy; do not repeat it against a changed remote SHA.
 
-### Temporary local fetch safeguard
+### Temporary local fetch safeguard — removed after approved push
 
-The stale origin/main ref and its upstream association were not restored. The origin URL is unchanged.
-A repository-local negative fetch refspec, `^refs/heads/main`, temporarily excludes the old remote main
-from ordinary fetches, preventing background tools from importing its unsanitized history. No global
-configuration was changed. After a separately approved exact-lease push confirms the sanitized remote
-SHA, remove only that negative refspec and restore normal upstream tracking; do not remove the guard
-and fetch the old history before the approved update.
+The negative refspec protected the old remote-history interval. After the exact-lease update succeeded,
+it was removed and normal fetch/upstream tracking to origin/main was restored. This repository-local
+cleanup did not change global Git configuration. Do not merge a legacy clone or restore an old backup
+branch into the sanitized history; those copies still contain the superseded artwork.

@@ -71,7 +71,8 @@ Runner availability and the installed Xcode path were checked against GitHub's
 [runner inventory](https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md)
 and [Xcode 27 availability notice](https://github.blog/changelog/2026-10-15-xcode-27-runner-image-generally-available/).
 Images may change; a removed toolchain should cause an explicit CI failure, not silently test an older OS.
-The workflow has not run remotely. Approval is required before pushing or using any paid runner allowance.
+The [first remote run](https://github.com/lucascacao95/roll/actions/runs/45623132133) passed on 2026-11-25, using Xcode 27.0 and Swift 6.4.
+Push/CI authorization did not authorize public visibility, releases or binary distribution.
 No larger runner or automatic release is configured.
 
 ## Release application and ZIP

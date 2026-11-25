@@ -2,15 +2,22 @@
 
 Audit date: **2026-11-24**. Proposed first public source release: **v0.1.0**, build **3**.
 
-**Verdict: NOT READY FOR PUBLICATION — local candidate ready for authorized private CI review.**
-The current icon and local history are sanitized, licensed and verified. The maintainer approved the narrow
-local history rewrite, not a push. The private remote still points to its old history; an explicitly approved
-exact-lease update, passing remote CI and final maintainer review are required before public visibility.
-No further local code/asset blocker is known. See [history verification](ICON_MIGRATION.md).
+**Verdict: READY WITH KNOWN LIMITATIONS — awaiting final approval for public visibility.**
 
-The follow-up previously found PUBLIC visibility and restored PRIVATE under explicit instruction.
-This history-cleanup stage made no remote mutation: no push, force push, tag, release or visibility change.
-Possible downloads from the earlier public interval cannot be revoked by a local rewrite.
+On **2026-11-25**, the maintainer authorized the exact-lease push and remote CI. The sanitized history was
+pushed with an explicit lease on the previously verified b9be783 remote SHA. Remote main now contains
+that sanitized history, and the repository remains **PRIVATE**. Normal local fetch/upstream tracking was
+restored only after the successful push; the temporary negative main-fetch refspec was removed.
+
+[First remote CI run](https://github.com/lucascacao95/roll/actions/runs/45623132133) **passed** on dfe07cd:
+95 tests in pt-BR, 4 localization/identity tests in English, normal Debug and Release builds,
+strict signature verification and the standalone discovery regression. The runner used Xcode 27.0 and
+Swift 6.4. A nonblocking checkout-action Node 20 deprecation annotation remains; GitHub ran it with Node 24.
+No application dependency or workflow change was made to silence this annotation.
+
+No tags, releases, binaries or public-visibility change were published. Public visibility requires final
+maintainer review. Historical caches/external copies and the documented manual/hardware limitations
+remain outside the guarantees of this preparation. The following sections retain the audit evidence.
 
 ## Inspection and audit scope
 
@@ -102,7 +109,7 @@ Xcode **27.0** (27A266a), Apple Swift **6.4**, macOS 27 SDK and Swift 6 language
 | macOS 14 universal diagnostic | Release compile/link succeeded with arm64 + x86_64 and minos 14.0 in both slices; analysis-only override, not runtime support validation |
 | macOS 13 diagnostic | Expected availability failure in Observation/Bindable; no source/configuration changes to bypass it |
 | Xcode project, manifest, entitlements, shared scheme/catalogs | Parsed successfully; bundle/catalog tests passed |
-| Workflow | YAML syntax/basic structure and local check script passed; remote run not performed |
+| Workflow | YAML/local validation passed; remote run 45623132133 passed on 2026-11-25 |
 | Shell scripts and whitespace | bash -n and git diff --check passed |
 
 The compiled Release is thin **arm64**, Roll.app / executable Roll, version **0.1.0 (3)**, minimum macOS **27.0**,
@@ -155,7 +162,7 @@ not establish absence of previous downloads/clones. Remote main is unchanged.
   builds; no public version/tag/release exists. Local older DMGs are preserved, not overwritten/rebranded.
 - MIT code/documentation license and Lucas Cacao Souza copyright holder were explicitly approved.
   Canonical reference: [MIT](https://opensource.org/license/mit). Current original icon code/outputs are included;
-  the new grant does not assert rights in the superseded attachment left in history. No external packages,
+  the grant does not assert rights in the superseded attachment retained in private legacy backups/caches. No external packages,
   fonts or vendored libraries require new dependency notices.
 - docs/screenshots contains seven native production-view captures in an isolated harness, using original
   code-generated illustrations and actual imports. They are labeled as view captures without window chrome,
@@ -167,7 +174,7 @@ not establish absence of previous downloads/clones. Remote main is unchanged.
 Verified `gh` is installed/authenticated with active personal account **lucascacao95**. Repository owner type
 is **User**, not an organization. Existing repository: **lucascacao95/roll**, private, default branch **main**,
 origin using SSH. Local Git email is personal, and matches both author and committer in both existing commits.
-No global Git configuration was changed. Preparation and the cleanup report are committed locally with the approved personal email. No remote content changes occurred.
+No global Git configuration was changed. Preparation and the cleanup report are committed locally with the approved personal email. The authorized exact-lease remote update and first passing CI are recorded above.
 The follow-up visibility restoration is explicitly recorded above; the earlier private-state snapshot was stale.
 
 Prepared metadata (not applied remotely):
@@ -175,8 +182,8 @@ Prepared metadata (not applied remotely):
 - Name: roll (already exists).
 - Description: A native macOS app for importing, organizing and preserving photographs. Built for photography enthusiasts, inspired by analog photography.
 - Topics: macos, swift, swiftui, photography, photo-importer, raw-photography, photo-management, macos-app, open-source, file-management.
-- Visibility: private now; public only after approval and resolution of the asset gate.
-- License: MIT for current code/documentation/original art; superseded art removed locally; private remote update pending.
+- Visibility: private now; public only after final approval; the local/branch-history asset gate is resolved.
+- License: MIT for current code/documentation/original art; superseded art removed from local and advertised remote main history.
 - Default branch: main. Initial release: v0.1.0, still unreleased.
 
 Preliminary public-name search found other photography products using Roll, including
@@ -191,8 +198,9 @@ confusion before commercial distribution; no rename or paid legal work was initi
 | Priority | Item | Closure criterion |
 | --- | --- | --- |
 | RESOLVED | Local historical icon cleanup | Explicit approval received; seven blobs replaced, commit metadata/code preserved, local object/ref checks and sanitized-clone validation passed. |
-| BLOCKER | Public/remote authorization | Maintainer approves the concrete diff and authorizes push/visibility; separate approval for tags/releases or history rewrite. |
-| IMPORTANT | First remote CI | After approved push, confirm the actual GitHub run passes; image availability and local checks alone are not a remote result. |
+| APPROVAL | Public visibility | Private push/CI were authorized and completed; final public visibility still requires explicit maintainer approval. Tags/releases/binaries remain separate decisions. |
+| RESOLVED | First remote CI | [Run 45623132133](https://github.com/lucascacao95/roll/actions/runs/45623132133) passed on dfe07cd; real tests/build/signature checks, not an inferred result. |
+| OPTIONAL | Checkout action runtime | GitHub emitted a Node 20 deprecation annotation and forced checkout v4 onto Node 24. The run passed; review the pinned checkout version during routine CI maintenance. |
 | IMPORTANT | Private security reporting | Enable GitHub private vulnerability reporting before public launch, or confirm the documented private contact channel works. |
 | IMPORTANT | Manual UI/accessibility | Verify folder pickers, navigation, focus/keyboard/VoiceOver, selection/scrolling and recovery transitions in both appearances. |
 | IMPORTANT | Hardware faults | Use disposable media/fixtures for drive removal, permission revocation and abrupt termination; inspect copies/journals before claiming coverage. |
@@ -206,17 +214,17 @@ after any source/asset changes; verify local Git identity; approve remote action
 reporting; review public README/license/rendered links; only then approve visibility change. No automatic
 release, binary distribution, paid service or certificate use is configured.
 
-## Publication sequence — approval gates, not executed
+## Publication sequence — current status and remaining approval
 
-The previous normal-push instructions are superseded: a normal new commit would leave old icon blobs
-reachable. Follow the precise [ICON_MIGRATION.md](ICON_MIGRATION.md) plan instead.
+The initial cleanup required the precise [ICON_MIGRATION.md](ICON_MIGRATION.md) exact-lease update;
+a new tip commit alone would not have removed the old history. That update is now complete. Subsequent
+changes use ordinary commits/pushes on sanitized main; do not repeat the historical force-push procedure.
 
 1. Review the new artwork, final diff, approved personal Git identity and validation evidence.
 2. Completed: explicit authorization, private backup, isolated seven-blob replacement, exact metadata/code
    comparisons and checks of every reachable ref/current files. No unrelated source changes were introduced.
-3. Obtain separate authorization for the reviewed commits and exact-lease push while PRIVATE. Recheck
-   remote main against the expected SHA before pushing. Do not use a force/mirror push or change global config.
-4. Inspect and wait for the actual CI run. The workflow is prepared and locally validated, not remotely proven.
+3. Completed on 2026-11-25: authorized exact-lease push while PRIVATE; the expected old SHA matched.
+4. Completed: the actual first GitHub CI run passed. Documentation updates are also checked by the same workflow.
 5. Stop for maintainer review after passing CI. Public visibility requires explicit final approval.
 6. Tags, GitHub releases and binaries are separate decisions and are not automatic outcomes of any prior approval.
 
@@ -272,7 +280,8 @@ Intentionally unchanged: Bundle Identifier, internal module/target/scheme names,
 bookmark and preference formats, persisted raw values, JSON schema versions, journal path, safe-copy engine,
 user original files and import behavior. Icon pixels were replaced with original art; historical image
 blobs were replaced under explicit approval, preserving all commit metadata and non-image trees. The earlier
-visibility restoration was the only remote mutation; no content update has been pushed.
+visibility restoration was followed by the explicitly approved exact-lease private push on 2026-11-25.
+No public visibility, tags, releases or binary uploads were performed.
 
 ## Authorized history cleanup verification
 
@@ -283,21 +292,17 @@ author/committer timestamps and file modes were compared exactly. Seven old blob
 cannot be loaded from the clean object database. git fsck passed. The complete map is in ICON_MIGRATION.md.
 
 An offline verified bundle, original Git directory and working-tree snapshot are stored outside publication
-refs in a separate private backup. The publication repository has no backup/replace/old-origin ref that
-could reintroduce those blobs. The origin URL remains configured; stale origin/main is intentionally absent.
-Do not fetch or merge the old remote history before the separately approved exact-lease push.
+refs in a separate private backup. The publication repository has no backup/replace/old-origin ref containing those blobs. The origin URL
+is unchanged and origin/main now tracks the sanitized remote after the authorized push.
 
-A real remote CI result is still pending. This stage intentionally makes no public-readiness claim based
-solely on a local build and cannot remove copies from earlier external downloads or GitHub caches.
+A real remote CI result is now available: [first passing run](https://github.com/lucascacao95/roll/actions/runs/45623132133). Final public approval is still
+required, and this cannot remove copies from earlier external downloads or GitHub caches.
 
-### Temporary local fetch safeguard
+### Local fetch safeguard — completed
 
-The stale origin/main ref and its upstream association were not restored. The origin URL is unchanged.
-A repository-local negative fetch refspec, `^refs/heads/main`, temporarily excludes the old remote main
-from ordinary fetches, preventing background tools from importing its unsanitized history. No global
-configuration was changed. After a separately approved exact-lease push confirms the sanitized remote
-SHA, remove only that negative refspec and restore normal upstream tracking; do not remove the guard
-and fetch the old history before the approved update.
+The temporary negative main-fetch refspec protected the old remote-history interval. After the approved
+exact-lease push succeeded, that single negative refspec was removed, main was fetched and upstream
+tracking restored to origin/main. Both refs point into the sanitized history. No global configuration changed.
 
 Post-rewrite validation passed on the clean serialized checkout: **95 XCTest cases**, **4 English
 localization cases**, the standalone /private/tmp regression, Debug/Release builds and strict Release

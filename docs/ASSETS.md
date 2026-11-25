@@ -39,9 +39,10 @@ With explicit authorization, seven exact old PNG blobs were replaced in a fresh 
 preserving the two development commits' code and metadata. The eleven historical paths remain for old
 catalog/README compatibility but now contain original repository-generated artwork. No old image blob is
 reachable or present in the sanitized local object database. See [ICON_MIGRATION.md](ICON_MIGRATION.md)
-for the commit map, byte-level checks, separate private backup and pending remote-update safeguards.
+for the commit map, byte-level checks, separate private backup and completed remote-update safeguards.
 
-The unmodified remote remains private and still has the previous history until an approved exact-lease push.
+The separately approved exact-lease push updated remote main to the sanitized history on 2026-11-25.
+The first remote CI passed; the repository remains private for final review.
 Private legacy backups and ignored old DMGs/bundles must not be published or reused as release assets.
 The current MIT grant does not assert rights in those old copies, nor erase possible earlier external downloads.
 No destructive cleanup, force push or public visibility change accompanied the local history rewrite.
